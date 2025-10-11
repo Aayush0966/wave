@@ -6,6 +6,7 @@ import type { AppRouter } from "@wave/api/routers/index";
 
 export const queryClient = new QueryClient();
 
+
 const trpcClient = createTRPCClient<AppRouter>({
 	links: [
 		httpBatchLink({
