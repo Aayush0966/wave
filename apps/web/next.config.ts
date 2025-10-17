@@ -1,8 +1,7 @@
-import type { NextConfig } from "next";
-import dotenv from "dotenv";
 import path from "node:path";
+import dotenv from "dotenv";
+import type { NextConfig } from "next";
 
-// Load root .env.local file
 dotenv.config({
 	path: path.resolve(import.meta.dirname, "../../.env.local"),
 });

@@ -1,4 +1,5 @@
 {
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"target": "ES2017",
 		"lib": ["dom", "dom.iterable", "esnext"],
@@ -20,7 +21,11 @@
 			}
 		],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@wave/ui": ["../../packages/ui/src"],
+			"@wave/api": ["../../packages/api/src"],
+			"@wave/auth": ["../../packages/auth/src"],
+			"@wave/db": ["../../packages/db/src"]
 		}
 	},
 	"include": [

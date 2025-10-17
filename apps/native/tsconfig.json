@@ -3,7 +3,11 @@
 	"compilerOptions": {
 		"strict": true,
 		"paths": {
-			"@/*": ["./*"]
+			"@/*": ["./*"],
+			"@wave/ui": ["../../packages/ui/src"],
+			"@wave/api": ["../../packages/api/src"],
+			"@wave/auth": ["../../packages/auth/src"],
+			"@wave/db": ["../../packages/db/src"]
 		}
 	},
 	"include": [
