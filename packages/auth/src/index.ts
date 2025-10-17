@@ -1,7 +1,7 @@
-import { betterAuth, type BetterAuthOptions } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
 import { expo } from "@better-auth/expo";
 import prisma from "@wave/db";
+import { type BetterAuthOptions, betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
 
 export const auth = betterAuth<BetterAuthOptions>({
 	database: prismaAdapter(prisma, {
