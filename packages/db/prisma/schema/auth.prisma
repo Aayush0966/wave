@@ -1,15 +1,17 @@
 model User {
-  id            String    @id @map("_id")
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
+  id               String            @id @map("_id")
+  name             String
+  email            String
+  emailVerified    Boolean
+  username         String
+  image            String?
+  createdAt        DateTime
+  updatedAt        DateTime
+  sessions         Session[]
+  accounts         Account[]
+  chatParticipants ChatParticipant[]
 
-  @@unique([email])
+  @@unique([email, username])
   @@map("user")
 }
 

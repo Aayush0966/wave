@@ -1,0 +1,16 @@
+enum MessageType {
+    TEXT
+    ATTACHMENT
+    IMAGE
+    VIDEO
+}
+
+enum ChatParticipantRole {
+    ADMIN
+    MEMBER
+}
+
+enum MessageDeleteType {
+    EVERYONE
+    SELF
+}
