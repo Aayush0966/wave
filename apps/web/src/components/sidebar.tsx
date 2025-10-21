@@ -12,16 +12,16 @@ import Link from "next/link";
 
 const Sidebar = () => {
 	const navItems = [
-		{ label: "Chats", icon: MessageCircle, route: "/" },
-		{ label: "Friends", icon: Users, route: "/friends" },
-		{ label: "Profile", icon: User, route: "/profile" },
-		{ label: "Reports", icon: BarChart, route: "/reports" },
-		{ label: "Settings", icon: Settings, route: "/settings" },
+		{ label: "Chats", icon: MessageCircle, route: "/dashboard" },
+		{ label: "Friends", icon: Users, route: "/dashboard/friends" },
+		{ label: "Profile", icon: User, route: "/dashboard/profile" },
+		{ label: "Reports", icon: BarChart, route: "/dashboard/reports" },
+		{ label: "Settings", icon: Settings, route: "/dashboard/settings" },
 		{ label: "Logout", icon: LogOutIcon, route: "/logout" },
 	];
 
 	return (
-		<div className="absolute top-10 left-0 hidden w-full max-w-32 flex-col items-center gap-15 bg-silver py-8 lg:flex dark:bg-night-800">
+		<div className="over absolute top-10 left-0 hidden h-screen w-full max-w-32 flex-col items-center gap-15 py-8 lg:flex">
 			<div className="">
 				<Image
 					src={icons.lightLogo}
@@ -40,8 +40,8 @@ const Sidebar = () => {
 							href={{ pathname: item.route }}
 							className="flex flex-col items-center justify-center gap-1.5 text-center transition-opacity hover:opacity-70"
 						>
-							<Icon className="h-6 w-6" />
-							<span className="text-xs">{item.label}</span>
+							<Icon color="white" className="h-6 w-6" />
+							<span className="text-white text-xs">{item.label}</span>
 						</Link>
 					);
 				})}
@@ -56,8 +56,8 @@ const Sidebar = () => {
 							href={{ pathname: item.route }}
 							className="flex flex-col items-center justify-center gap-1.5 text-center transition-opacity hover:opacity-70"
 						>
-							<Icon className="h-6 w-6" />
-							<span className="text-xs">{item.label}</span>
+							<Icon color="white" className="h-6 w-6" />
+							<span className="text-white text-xs">{item.label}</span>
 						</Link>
 					);
 				})}
