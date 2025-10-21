@@ -1,0 +1,59 @@
+model Message {
+    id          String          @id @map("_id")
+    messageType MessageType     @default(TEXT)
+    senderId    String
+    sender      ChatParticipant @relation(fields: [senderId], references: [id])
+    content     String?
+    chatId      String
+    chat        Chat            @relation(fields: [chatId], references: [id])
+    reacts      React[]
+    seenBy      MessageSeen[]
+    deletedBy   MessageDelete[]
+
+    createdAt         DateTime            @default(now())
+    updatedAt         DateTime            @updatedAt
+    MessageAttachment MessageAttachment[]
+
+    @@index([chatId])
+}
+
+model MessageAttachment {
+    id            String  @id @map("_id")
+    messageId     String
+    message       Message @relation(fields: [messageId], references: [id])
+    attachmentUrl String
+}
+
+model MessageSeen {
+    id                String          @id @map("_id")
+    chatParticipantId String
+    chatParticipant   ChatParticipant @relation(fields: [chatParticipantId], references: [id])
+    messageId         String
+    message           Message         @relation(fields: [messageId], references: [id])
+    seenAt            DateTime        @default(now())
+
+    @@unique([chatParticipantId, messageId])
+}
+
+model MessageDelete {
+    id                String            @id @map("_id")
+    chatParticipantId String
+    chatParticipant   ChatParticipant   @relation(fields: [chatParticipantId], references: [id])
+    deleteType        MessageDeleteType
+    messageId         String
+    message           Message           @relation(fields: [messageId], references: [id])
+    deletedAt         DateTime          @default(now())
+
+    @@unique([chatParticipantId, messageId])
+}
+
+model React {
+    id          String          @id @map("_id")
+    messageId   String
+    message     Message         @relation(fields: [messageId], references: [id])
+    emoji       String
+    reactedById String
+    reactedBy   ChatParticipant @relation(fields: [reactedById], references: [id])
+
+    @@unique([reactedById, messageId])
+}

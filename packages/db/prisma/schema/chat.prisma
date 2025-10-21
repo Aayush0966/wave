@@ -1,0 +1,28 @@
+model Chat {
+  id               String            @id() @map("_id")
+  title            String
+  chatParticipants ChatParticipant[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  deletedAt        DateTime?
+
+  messages Message[]
+}
+
+model ChatParticipant {
+  id            String              @id() @map("_id")
+  chatId        String
+  chat          Chat                @relation(fields: [chatId], references: [id])
+  userId        String
+  user          User                @relation(fields: [userId], references: [id])
+  role          ChatParticipantRole @default(MEMBER)
+  joinedAt      DateTime            @default(now())
+  messages      Message[]
+  messageSeen   MessageSeen[]
+  messageDelete MessageDelete[]
+  reacts        React[]
+  lastReadAt    DateTime            @default(now())
+
+  @@unique([userId, chatId])
+  @@index([chatId, userId])
+}
