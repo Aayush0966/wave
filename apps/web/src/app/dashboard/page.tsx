@@ -2,7 +2,7 @@
 
 export default function Home() {
 	return (
-		<div className="flex w-full justify-center dark:bg-night-500">
+		<div className="flex w-full justify-center dark:bg-background-secondary">
 			<p>HI </p>
 		</div>
 	);

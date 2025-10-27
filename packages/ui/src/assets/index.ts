@@ -5,3 +5,8 @@ export const icons = {
 	darkLogo,
 	lightLogo,
 };
+
+export const animations = {
+	signinAnimation: "/animations/signin.lottie",
+	signupAnimation: "/animations/signup.lottie",
+};

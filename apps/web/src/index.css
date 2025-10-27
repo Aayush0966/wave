@@ -1,28 +1,55 @@
 @import "tailwindcss";
-@import "tailwindcss/preflight";
 @import "tw-animate-css";
+
+@source "../../apps/**/*.{js,ts,jsx,tsx,mdx}";
+@source "../../packages/ui/src/**/*.{js,ts,jsx,tsx,mdx}";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+	/* Your existing colors - map to color palette */
 	--color-night-800: #0a0a0a;
 	--color-night-500: #1f1f1f;
 	--color-jet: #292929;
 	--color-silver: #c2c2c2;
 
-	/* Text colors based on mode */
-	--color-text-light: #ffffff;
-	--color-text-dark: #000000;
-}
+	/* New elegant accent colors */
+	--color-emerald: #10b981;
+	--color-emerald-dark: #059669;
+	--color-amethyst: #8b5cf6;
+	--color-gold: #f59e0b;
+	--color-coral: #f97316;
 
-@layer base {
-	/* Default light mode text */
-	body {
-		color: var(--color-text-dark);
-	}
+	/* Map semantic colors to background, text, etc. */
+	--color-background-primary: var(--color-night-800);
+	--color-background-secondary: var(--color-night-500);
+	--color-background-tertiary: var(--color-jet);
 
-	/* Dark mode text */
-	.dark body {
-		color: var(--color-text-light);
-	}
+	--color-text-primary: #ffffff;
+	--color-text-secondary: var(--color-silver);
+	--color-text-muted: #888888;
+
+	--color-border: #333333;
+
+	/* Gradients */
+	--gradient-primary: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-amethyst) 100%);
+	--gradient-jet: linear-gradient(135deg, var(--color-jet) 0%, var(--color-night-500) 100%);
+
+	/* Extended color palette for Tailwind */
+	--color-primary: var(--color-emerald);
+	--color-primary-dark: var(--color-emerald-dark);
+	--color-secondary: var(--color-amethyst);
+	--color-accent: var(--color-gold);
+
+	/* Shadows */
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+	/* Border radius */
+	--radius-base: 12px;
+	--radius-sm: 8px;
+
+	/* Font family */
+	--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
