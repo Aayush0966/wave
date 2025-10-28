@@ -11,6 +11,7 @@
 		"resolveJsonModule": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
+		"baseUrl": "./",
 		"forceConsistentCasingInFileNames": true,
 		"isolatedModules": true,
 		"noUncheckedIndexedAccess": true,

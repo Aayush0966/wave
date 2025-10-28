@@ -2,6 +2,7 @@ import { expo } from "@better-auth/expo";
 import prisma from "@wave/db";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { username } from "better-auth/plugins";
 
 export const auth = betterAuth<BetterAuthOptions>({
 	database: prismaAdapter(prisma, {
@@ -18,5 +19,5 @@ export const auth = betterAuth<BetterAuthOptions>({
 			httpOnly: true,
 		},
 	},
-	plugins: [expo()],
+	plugins: [expo(), username()],
 });

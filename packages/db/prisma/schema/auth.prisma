@@ -3,7 +3,8 @@ model User {
   name             String
   email            String
   emailVerified    Boolean
-  username         String
+  username         String            @unique
+  displayUsername  String            @unique
   image            String?
   createdAt        DateTime
   updatedAt        DateTime

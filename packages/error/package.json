@@ -1,5 +1,5 @@
 {
-	"name": "@wave/auth",
+	"name": "@wave/error",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -19,13 +19,5 @@
 	},
 	"peerDependencies": {
 		"typescript": "^5"
-	},
-	"dependencies": {
-		"better-auth": "catalog:",
-		"@better-auth/expo": "^1.3.13",
-		"dotenv": "catalog:",
-		"zod": "catalog:",
-		"@wave/db": "workspace:*",
-		"@wave/error": "workspace:*"
 	}
 }
