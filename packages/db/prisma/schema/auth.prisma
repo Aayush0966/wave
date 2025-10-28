@@ -1,7 +1,7 @@
 model User {
   id               String            @id @map("_id")
   name             String
-  email            String
+  email            String            @unique
   emailVerified    Boolean
   username         String            @unique
   displayUsername  String            @unique
@@ -12,7 +12,7 @@ model User {
   accounts         Account[]
   chatParticipants ChatParticipant[]
 
-  @@unique([email, username])
+  @@unique([email, username], name: "email_username")
   @@map("user")
 }
 

@@ -7,7 +7,6 @@ import emailTemplates from "./templates";
 interface EmailDTO {
 	to: string;
 	subject: string;
-	text: string;
 	type: "EMAIL_VERIFY" | "RESET_PASSWORD";
 	name: string;
 	link: string;
@@ -15,7 +14,6 @@ interface EmailDTO {
 export default async function sendEmail({
 	to,
 	subject,
-	text,
 	type,
 	name,
 	link,
@@ -27,7 +25,6 @@ export default async function sendEmail({
 			from: `Wave <${process.env.EMAIL}>`,
 			to,
 			subject,
-			text,
 			html,
 		};
 		const result = await transporter.sendMail(mailOptions);

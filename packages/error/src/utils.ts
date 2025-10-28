@@ -1,5 +1,5 @@
-import { WaveError } from "./errors.js";
-import { ErrorCode } from "./types.js";
+import { WaveError } from "./errors";
+import { ErrorCode } from "./types";
 
 export const createError = {
 	unauthorized: (message = "Unauthorized access") =>

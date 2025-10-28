@@ -21,7 +21,7 @@ const Sidebar = () => {
 	];
 
 	return (
-		<div className="over absolute top-10 left-0 hidden h-screen w-full max-w-32 flex-col items-center gap-15 py-8 lg:flex">
+		<div className="over absolute top-10 left-0 hidden max-h-screen w-full max-w-32 flex-col items-center gap-15 py-8 lg:flex">
 			<div className="">
 				<Image
 					src={icons.lightLogo}

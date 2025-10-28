@@ -13,7 +13,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<div className="flex w-full gap-4 bg-background-primary p-10">
+		<div className="flex h-screen w-full gap-4 overflow-hidden bg-background-primary">
 			<div className="hidden h-screen w-28 flex-shrink-0 lg:block">
 				<Sidebar />
 			</div>

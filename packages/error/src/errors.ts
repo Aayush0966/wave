@@ -1,4 +1,4 @@
-import { ErrorCode, type ErrorDetails } from "./types.js";
+import { ErrorCode, type ErrorDetails } from "./types";
 
 export class WaveError extends Error {
 	public readonly code: ErrorCode;
