@@ -1,5 +1,5 @@
 import { expo } from "@better-auth/expo";
-import prisma from "@wave/db";
+import { prisma } from "@wave/db";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { username } from "better-auth/plugins";

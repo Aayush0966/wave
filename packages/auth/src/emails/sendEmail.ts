@@ -1,5 +1,5 @@
 import { render } from "@react-email/render";
-import { createError, toWaveError } from "@wave/error";
+import { TRPCError } from "@trpc/server";
 import { createElement } from "react";
 import transporter from ".";
 import emailTemplates from "./templates";
@@ -30,12 +30,20 @@ export default async function sendEmail({
 		const result = await transporter.sendMail(mailOptions);
 
 		if (result.rejected.length > 0) {
-			throw createError.internal(`Email rejected: ${result.response}`);
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: `Email rejected: ${result.response}`,
+			});
 		}
 
 		return result;
 	} catch (error) {
-		throw toWaveError(error);
+		console.log("Error while sending email: ", error);
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: "Failed to send email",
+			cause: error,
+		});
 	}
 }
 
