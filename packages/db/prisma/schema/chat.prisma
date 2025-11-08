@@ -1,5 +1,5 @@
 model Chat {
-  id               String            @id() @map("_id")
+  id               String            @id() @map("_id") @default(uuid()) 
   title            String
   chatParticipants ChatParticipant[]
   createdAt        DateTime          @default(now())
@@ -10,7 +10,7 @@ model Chat {
 }
 
 model ChatParticipant {
-  id            String              @id() @map("_id")
+  id            String              @id() @map("_id") @default(uuid())
   chatId        String
   chat          Chat                @relation(fields: [chatId], references: [id])
   userId        String
@@ -26,3 +26,8 @@ model ChatParticipant {
   @@unique([userId, chatId])
   @@index([chatId, userId])
 }
+
+
+//todo
+//default uuid() everywhere
+//work on createChat repository and services 

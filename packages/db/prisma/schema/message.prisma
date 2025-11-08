@@ -1,5 +1,5 @@
 model Message {
-    id          String          @id @map("_id")
+    id          String          @id @map("_id") @default(uuid())
     messageType MessageType     @default(TEXT)
     senderId    String
     sender      ChatParticipant @relation(fields: [senderId], references: [id])
@@ -18,14 +18,14 @@ model Message {
 }
 
 model MessageAttachment {
-    id            String  @id @map("_id")
+    id            String  @id @map("_id") @default(uuid())
     messageId     String
     message       Message @relation(fields: [messageId], references: [id])
     attachmentUrl String
 }
 
 model MessageSeen {
-    id                String          @id @map("_id")
+    id                String          @id @map("_id") @default(uuid())
     chatParticipantId String
     chatParticipant   ChatParticipant @relation(fields: [chatParticipantId], references: [id])
     messageId         String
@@ -36,7 +36,7 @@ model MessageSeen {
 }
 
 model MessageDelete {
-    id                String            @id @map("_id")
+    id                String            @id @map("_id") @default(uuid())
     chatParticipantId String
     chatParticipant   ChatParticipant   @relation(fields: [chatParticipantId], references: [id])
     deleteType        MessageDeleteType
@@ -48,7 +48,7 @@ model MessageDelete {
 }
 
 model React {
-    id          String          @id @map("_id")
+    id          String          @id @map("_id") @default(uuid())
     messageId   String
     message     Message         @relation(fields: [messageId], references: [id])
     emoji       String
