@@ -1,34 +1,49 @@
 import { TRPCError } from "@trpc/server";
 
-export class BaseRepository<T, CreateInput = any, UpdateInput = any> {
-	constructor(protected model: any) {}
+type Model = {
+	findUnique: (args: any) => Promise<any>;
+	findMany: (args?: any) => Promise<any[]>;
+	create: (args: any) => Promise<any>;
+	update: (args: any) => Promise<any>;
+	delete: (args: any) => Promise<any>;
+};
 
-	async getById(id: string): Promise<T | null> {
-		return this.model.findUnique({ where: { id } });
-	}
+export type Repository = {
+	getById: (id: string) => Promise<any>;
+	getAll: () => Promise<any>;
+	create: (data: any) => Promise<any>;
+	update: (id: string, data: any) => Promise<any>;
+	delete: (id: string) => Promise<any>;
+};
 
-	async getAll(): Promise<T[]> {
-		return this.model.findMany();
-	}
+const CreateRepository = (model: Model): Repository => {
+	return {
+		getById: async (id: string) => {
+			return model.findUnique({ where: { id } });
+		},
 
-	async create(data: CreateInput): Promise<T> {
-		return this.model.create({ data });
-	}
+		getAll: async () => {
+			return model.findMany();
+		},
 
-	async update(id: string, data: UpdateInput): Promise<T> {
-		const updated = await this.model.update({
-			where: { id },
-			data,
-		});
-		if (!updated)
-			throw new TRPCError({ code: "NOT_FOUND", message: "Record not found" });
-		return updated;
-	}
+		create: async (data: any) => {
+			return model.create({ data });
+		},
 
-	async delete(id: string): Promise<T> {
-		const deleted = await this.model.delete({ where: { id } });
-		if (!deleted)
-			throw new TRPCError({ code: "NOT_FOUND", message: "Record not found" });
-		return deleted;
-	}
-}
+		update: async (id: string, data: any) => {
+			const updated = await model.update({ where: { id }, data });
+			if (!updated)
+				throw new TRPCError({ code: "NOT_FOUND", message: "Record not found" });
+			return updated;
+		},
+
+		delete: async (id: string) => {
+			const deleted = await model.delete({ where: { id } });
+			if (!deleted)
+				throw new TRPCError({ code: "NOT_FOUND", message: "Record not found" });
+			return deleted;
+		},
+	};
+};
+
+export default CreateRepository;

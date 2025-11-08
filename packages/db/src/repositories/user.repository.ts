@@ -1,14 +1,15 @@
-import type { User } from "@prisma/client";
-import prisma from "src/client";
-import { BaseRepository } from "./base.repository";
+import type { PrismaClient, User } from "@prisma/client";
+import CreateRepository, { type Repository } from "./base.repository";
 
-class UserRepository extends BaseRepository<User> {
-	constructor() {
-		super(prisma.user);
-	}
-	async getByUsername(username: string): Promise<User | null> {
-		return this.model.findUnique({ where: { username } });
-	}
-}
+export type UserRepository = Repository & {
+	getByUsername: (username: string) => Promise<User | null>;
+};
 
-export default UserRepository;
+export const CreateUserRepository = (db: PrismaClient): UserRepository => {
+	return {
+		...CreateRepository(db.user),
+		getByUsername: (username: string) => {
+			return db.user.findUnique({ where: { username } });
+		},
+	};
+};

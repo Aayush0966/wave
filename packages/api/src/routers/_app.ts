@@ -1,8 +1,9 @@
 import { router } from "src";
-import { userRouter } from "./user/user.router";
+import { chat, user } from "./routes";
 
 export const appRouter = router({
-	user: userRouter,
+	user,
+	chat,
 });
 
 export type AppRouter = typeof appRouter;
