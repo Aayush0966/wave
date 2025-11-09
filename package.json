@@ -20,7 +20,7 @@
 		"db:migrate": "turbo -F @wave/db db:migrate"
 	},
 	"dependencies": {
-		"@lottiefiles/dotlottie-react": "^0.17.6",
+		"@lottiefiles/dotlottie-react": "^0.17.7",
 		"@next/bundle-analyzer": "^15.5.6",
 		"@react-email/components": "^0.5.7",
 		"@rive-app/react-canvas": "^4.23.4",
@@ -30,24 +30,25 @@
 		"@trpc/next": "^11.7.1",
 		"@trpc/react-query": "^11.7.1",
 		"dotenv": "catalog:",
+		"next": "^16.0.1",
 		"nodemailer": "^7.0.10",
 		"pino": "^10.1.0",
 		"superjson": "^2.2.5",
-		"zod": "^4.1.11",
+		"zod": "^4.1.12",
 		"zustand": "^5.0.8"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.0",
+		"@biomejs/biome": "^2.3.4",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.0",
-		"@types/node": "^22.13.11",
+		"@types/node": "^22.19.0",
 		"@types/nodemailer": "^7.0.3",
 		"husky": "^9.1.7",
-		"lint-staged": "^16.1.2",
+		"lint-staged": "^16.2.6",
 		"ts-node": "^10.9.2",
-		"tsdown": "^0.15.5",
-		"turbo": "^2.5.4",
-		"vitest": "^4.0.5"
+		"tsdown": "^0.15.12",
+		"turbo": "^2.6.0",
+		"vitest": "^4.0.8"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [

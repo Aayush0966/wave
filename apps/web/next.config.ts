@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
 			{ hostname: "example.com" },
 		],
 	},
+	cacheComponents: true,
 	typedRoutes: true,
 	transpilePackages: ["ui"],
 	webpack: (config) => {
