@@ -3,14 +3,14 @@ import { TRPCError } from "@trpc/server";
 import type { CreateChatParams } from "../schemas/chat.schemas";
 import CreteRepository, { type Repository } from "./base.repository";
 
-type ChatListType = {
+export type ChatListType = {
 	title: string;
 	id: string;
 	image: string | null;
 	lastMessage: string;
 	name: string;
 	lastMessageSentBy: string;
-	time: string;
+	time: string | null;
 	unseenMessageCount: number;
 };
 
@@ -111,7 +111,7 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 					image: otherParticipant?.user.image || null,
 					name: otherParticipant?.user.name || "Unknown",
 					unseenMessageCount: unseenMessageCount,
-					time: (lastMessage?.createdAt || new Date()).toISOString(),
+					time: lastMessage?.createdAt?.toISOString() || null,
 					lastMessageSentBy: lastMessage?.senderId || "",
 					lastMessage: lastMessage?.content || "",
 				};

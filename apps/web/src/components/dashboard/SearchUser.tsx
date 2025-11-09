@@ -3,8 +3,7 @@
 import { SearchIcon, Users, XIcon } from "lucide-react"
 import { Input } from "../ui/input"
 import { useState, useEffect, useRef } from "react"
-import { trpc } from "@/utils/trpc"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { trpc } from "@/lib/trpc-client"
 
 
 const SearchUser = () => {
@@ -12,8 +11,10 @@ const SearchUser = () => {
     const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const options = trpc.user.getByUsername.queryOptions({ username: query }, { enabled: query.length > 0 });
-    const { data: users, isLoading, isError:searchError } = useQuery(options);
+    const { data: users, isLoading, isError: searchError } = trpc.user.getByUsername.useQuery(
+        { username: query },
+        { enabled: query.length > 0 }
+    );
 
     const handleClickOutside = (event: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -28,16 +29,12 @@ const SearchUser = () => {
         };
     }, []);
 
-    // const {data: chat, isError: createError} = trpc.chat.createChat.mutationOptions()
+    const createChatMutation = trpc.chat.createChat.useMutation()
 
-
-    // if (createError) {
-    //     toast.error("Error while creating chat")
-    // }
 
     const handleUserClick = (userId: string) => {
         setDropdownVisible(false);
-        
+        createChatMutation.mutate({ userId: userId })
     };
 
     return (
@@ -50,7 +47,7 @@ const SearchUser = () => {
                     type="text"
                     value={query}
                     onChange={(e) => {
-                        setQuery(e.target.value);
+                        setQuery(e.target.value.toLowerCase());
                         setDropdownVisible(true);
                     }}
                     onKeyDown={(e) => {

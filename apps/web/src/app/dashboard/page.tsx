@@ -1,8 +1,10 @@
+
 import ChatList from "@/components/dashboard/ChatList";
-import { appRouter } from "@wave/api";
 import { auth } from "@wave/auth";
 import { headers } from "next/headers";
 import SearchUser from "@/components/dashboard/SearchUser";
+import { trpc } from "@/lib/trpc-server";
+import { toast } from "sonner";
 
 export default async function Home() {
 	const session = await auth.api.getSession({
@@ -13,8 +15,10 @@ export default async function Home() {
 		return <div>Please sign in to view your chats</div>;
 	}
 
-	const caller = appRouter.createCaller({ session });
-	const chats = await caller.chat.getUserChats();
+	const serverTrpc = await trpc();
+	const chats = await serverTrpc.chat.getUserChats().catch((err) => {
+		toast.error("Error: ", err)
+	})
 
 
 	return (

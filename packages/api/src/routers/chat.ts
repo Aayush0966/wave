@@ -10,8 +10,14 @@ const chatService = CreateChatService(chatRepo);
 export const chat = router({
 	createChat: protectedProcedure
 		.input(createChatSchema)
-		.mutation(async ({ input }) => {
-			return await chatService.createChat(input);
+		.mutation(async ({ input, ctx }) => {
+			const sessionUserId = ctx.session.user.id; 
+			const targetUserId = input.userId; 
+
+			return await chatService.createChat({
+				user1Id: sessionUserId,
+				user2Id: targetUserId
+			});
 		}),
 
 	getUserChats: protectedProcedure
