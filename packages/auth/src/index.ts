@@ -12,7 +12,7 @@ export const auth = betterAuth<BetterAuthOptions>({
 	trustedOrigins: [process.env.CORS_ORIGIN || "", "mybettertapp://", "exp://"],
 	emailAndPassword: {
 		enabled: true,
-		requireEmailVerification: true,
+		requireEmailVerification:false
 	},
 	emailVerification: {
 		sendVerificationEmail: async ({ user, url }) => {

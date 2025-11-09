@@ -4,7 +4,7 @@ import type { UserRepository } from "@wave/db";
 
 export type UserService = {
 	getProfile: (id: string) => Promise<User>;
-	getByUsername: (username: string) => Promise<User>;
+	getByUsername: (username: string) => Promise<User[]>;
 };
 
 const CreateUserService = (repo: UserRepository): UserService => {
@@ -21,7 +21,7 @@ const CreateUserService = (repo: UserRepository): UserService => {
 			if (!user)
 				throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
 			return user;
-		},
+		}
 	};
 };
 

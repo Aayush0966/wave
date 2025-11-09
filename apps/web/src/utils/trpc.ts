@@ -1,15 +1,17 @@
+// utils/trpc.ts
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
-import type { AppRouter } from "@wave/api/";
+import type { AppRouter } from "@wave/api";  // type import only
 import { toast } from "sonner";
 
+// Create globally shared React Query client
 export const queryClient = new QueryClient({
 	queryCache: new QueryCache({
-		onError: (error) => {
-			toast.error(error.message, {
+		onError: (error: any) => {
+			toast.error(error.message ?? "An error occurred", {
 				action: {
-					label: "retry",
+					label: "Retry",
 					onClick: () => {
 						queryClient.invalidateQueries();
 					},
@@ -22,11 +24,11 @@ export const queryClient = new QueryClient({
 const trpcClient = createTRPCClient<AppRouter>({
 	links: [
 		httpBatchLink({
-			url: "/api/trpc",
-			fetch(url: string, options?: RequestInit) {
+			url: "/api/trpc",  // ensure this is correct for your environment
+			fetch(url: string | RequestInfo, options?: RequestInit) {
 				return fetch(url, {
 					...options,
-					credentials: "include",
+					credentials: "include", // include cookies/session
 				});
 			},
 		}),

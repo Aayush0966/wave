@@ -28,6 +28,3 @@ model ChatParticipant {
 }
 
 
-//todo
-//default uuid() everywhere
-//work on createChat repository and services 

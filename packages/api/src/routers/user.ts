@@ -1,7 +1,7 @@
 import { CreateUserRepository, prisma } from "@wave/db";
-import { protectedProcedure, router } from "src";
-import CreateUserService from "src/services/user";
 import { z } from "zod";
+import { protectedProcedure, router } from "../trpc";
+import CreateUserService from "../services/user";
 
 const userRepository = CreateUserRepository(prisma);
 const userService = CreateUserService(userRepository);
@@ -18,4 +18,6 @@ export const user = router({
 		.query(async ({ input }) => {
 			return await userService.getByUsername(input.username);
 		}),
+
+
 });

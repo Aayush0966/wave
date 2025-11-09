@@ -1,6 +1,7 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"baseUrl": ".",
 		"target": "ES2017",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"allowJs": true,
@@ -21,11 +22,7 @@
 			}
 		],
 		"paths": {
-			"@/*": ["./src/*"],
-			"@wave/ui": ["../../packages/ui/src"],
-			"@wave/api": ["../../packages/api/src"],
-			"@wave/auth": ["../../packages/auth/src"],
-			"@wave/db": ["../../packages/db/src"]
+			"@/*": ["./src/*"]
 		}
 	},
 	"include": [

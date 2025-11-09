@@ -7,7 +7,7 @@ const ChatList = ({ chat }: { chat: Chat }) => {
 			<div className="relative h-16 w-16 flex-shrink-0">
 				<Image
 					alt="profile image"
-					src={chat.image}
+					src={chat.image || "/default-avatar.png"}
 					width={64}
 					height={64}
 					className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
