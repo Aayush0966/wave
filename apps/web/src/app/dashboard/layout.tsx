@@ -17,7 +17,7 @@ export default function RootLayout({
 			<div className="hidden h-screen w-28 flex-shrink-0 lg:block">
 				<Sidebar />
 			</div>
-			<main className="flex h-screen w-full items-center justify-center overflow-hidden rounded-3xl bg-white dark:bg-background-secondary">
+			<main className="flex h-screen w-full overflow-hidden rounded-3xl bg-white dark:bg-background-secondary">
 				{children}
 			</main>
 		</div>

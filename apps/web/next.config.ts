@@ -8,7 +8,10 @@ dotenv.config({
 
 const nextConfig: NextConfig = {
 	images: {
-		remotePatterns: [{ hostname: "plus.unsplash.com" }],
+		remotePatterns: [
+			{ hostname: "plus.unsplash.com" },
+			{ hostname: "example.com" },
+		],
 	},
 	typedRoutes: true,
 	transpilePackages: ["ui"],

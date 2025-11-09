@@ -13,7 +13,7 @@ export const user = router({
 			return await userService.getProfile(input.id);
 		}),
 
-	getUserByEmail: protectedProcedure
+	getByUsername: protectedProcedure
 		.input(z.object({ username: z.string() }))
 		.query(async ({ input }) => {
 			return await userService.getByUsername(input.username);

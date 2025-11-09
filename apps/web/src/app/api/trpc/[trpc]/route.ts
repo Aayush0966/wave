@@ -1,6 +1,7 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { appRouter } from "@wave/api/";
 import { createContext } from "@wave/api/context";
-import { appRouter } from "@wave/api/routers/index";
+
 import type { NextRequest } from "next/server";
 
 function handler(req: NextRequest) {

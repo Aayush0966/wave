@@ -8,9 +8,9 @@
 
 @theme {
 	/* Your existing colors - map to color palette */
-	--color-night-800: #0a0a0a;
-	--color-night-500: #1f1f1f;
-	--color-jet: #292929;
+	--color-night-800: #131313;
+	--color-night-500: #202428;
+	--color-jet: #30343c;
 	--color-silver: #c2c2c2;
 
 	/* New elegant accent colors */

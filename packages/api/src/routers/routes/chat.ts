@@ -5,7 +5,7 @@ import { CreateChatService } from "src/services/chat";
 const chatRepo = CreateChatRepository(prisma);
 const chatService = CreateChatService(chatRepo);
 
-export const chatRouter = router({
+export const chat = router({
 	createChat: protectedProcedure
 		.input(createChatSchema)
 		.mutation(async ({ input }) => {
