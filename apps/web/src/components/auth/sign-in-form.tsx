@@ -48,8 +48,11 @@ export default function SignInForm() {
 	}
 
 	return (
-		<div className="mt-14 w-full rounded-lg">
-			<h1 className="mb-6 text-center font-bold text-3xl">Welcome Back</h1>
+		<div className="w-full">
+			<div className="mb-8 text-center">
+				<h1 className="font-semibold text-2xl text-night-800 dark:text-text-primary tracking-tight">Welcome back</h1>
+				<p className="mt-1 text-silver text-sm">Sign in to your account to continue</p>
+			</div>
 
 			<form
 				onSubmit={(e) => {
@@ -57,76 +60,81 @@ export default function SignInForm() {
 					e.stopPropagation();
 					form.handleSubmit();
 				}}
-				className="space-y-8"
+				className="space-y-5"
 			>
-				<div>
-					<form.Field name="email">
-						{(field) => (
-							<div className="space-y-2">
-								<Label htmlFor={field.name}>Email</Label>
-								<Input
-									id={field.name}
-									name={field.name}
-									type="email"
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(e) => field.handleChange(e.target.value)}
-								/>
-								{field.state.meta.errors.map((error) => (
-									<p key={error?.message} className="text-red-500">
-										{error?.message}
-									</p>
-								))}
-							</div>
-						)}
-					</form.Field>
-				</div>
+				<form.Field name="email">
+					{(field) => (
+						<div className="space-y-1.5">
+							<Label htmlFor={field.name} className="text-night-800 dark:text-text-primary text-sm font-medium">
+								Email
+							</Label>
+							<Input
+								id={field.name}
+								name={field.name}
+								type="email"
+								placeholder="you@example.com"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(e) => field.handleChange(e.target.value)}
+								className="h-10 bg-white dark:bg-background-secondary text-night-800 dark:text-text-primary placeholder:text-silver/60 border-silver/30 dark:border-jet focus-visible:ring-primary"
+							/>
+							{field.state.meta.errors.map((error) => (
+								<p key={error?.message} className="text-destructive text-xs">
+									{error?.message}
+								</p>
+							))}
+						</div>
+					)}
+				</form.Field>
 
-				<div>
-					<form.Field name="password">
-						{(field) => (
-							<div className="space-y-2">
-								<Label htmlFor={field.name}>Password</Label>
-								<Input
-									id={field.name}
-									name={field.name}
-									type="password"
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(e) => field.handleChange(e.target.value)}
-								/>
-								{field.state.meta.errors.map((error) => (
-									<p key={error?.message} className="text-red-500">
-										{error?.message}
-									</p>
-								))}
-							</div>
-						)}
-					</form.Field>
-				</div>
+				<form.Field name="password">
+					{(field) => (
+						<div className="space-y-1.5">
+							<Label htmlFor={field.name} className="text-night-800 dark:text-text-primary text-sm font-medium">
+								Password
+							</Label>
+							<Input
+								id={field.name}
+								name={field.name}
+								type="password"
+								placeholder="••••••••"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(e) => field.handleChange(e.target.value)}
+								className="h-10 bg-white dark:bg-background-secondary text-night-800 dark:text-text-primary placeholder:text-silver/60 border-silver/30 dark:border-jet focus-visible:ring-primary"
+							/>
+							{field.state.meta.errors.map((error) => (
+								<p key={error?.message} className="text-destructive text-xs">
+									{error?.message}
+								</p>
+							))}
+						</div>
+					)}
+				</form.Field>
 
 				<form.Subscribe>
 					{(state) => (
 						<Button
 							type="submit"
-							className="w-full cursor-pointer bg-primary text-text-primary hover:bg-primary-dark"
+							className="mt-2 h-10 w-full cursor-pointer bg-primary font-medium text-text-primary hover:bg-primary-dark"
 							disabled={!state.canSubmit || state.isSubmitting}
 						>
-							{state.isSubmitting ? "Submitting..." : "Sign In"}
+							{state.isSubmitting ? "Signing in..." : "Sign in"}
 						</Button>
 					)}
 				</form.Subscribe>
 			</form>
 
-			<div className="mt-4 text-center">
-				<Button
-					variant="link"
+			<p className="mt-6 text-center text-silver text-sm">
+				Don&apos;t have an account?{" "}
+				<button
+					type="button"
 					onClick={() => router.replace("/auth/signup")}
-					className="cursor-pointer text-indigo-600 hover:text-indigo-800"
+					className="cursor-pointer font-medium text-primary underline-offset-4 hover:underline"
 				>
-					Need an account? Sign Up
-				</Button>
-			</div>
+					Sign up
+				</button>
+			</p>
 		</div>
 	);
 }

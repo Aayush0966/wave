@@ -11,7 +11,7 @@ const SignUpPage = () => {
 			</div>
 
 			{/* Sign-in form */}
-			<div className="flex items-center justify-center bg-text-primary">
+			<div className="flex items-center justify-center bg-white dark:bg-background-primary">
 				<div className="w-full max-w-xl p-5">
 					<SignUpForm />
 				</div>
