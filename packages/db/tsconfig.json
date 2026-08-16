@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"declaration": true,
 		"baseUrl": "./",
+		"ignoreDeprecations": "6.0",
 		"declarationMap": true,
 		"sourceMap": true,
 		"outDir": "dist",

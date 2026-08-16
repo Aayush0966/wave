@@ -22,6 +22,7 @@
 	"dependencies": {
 		"@lottiefiles/dotlottie-react": "catalog:",
 		"@next/bundle-analyzer": "catalog:",
+		"@prisma/adapter-pg": "^7.9.1",
 		"@react-email/components": "catalog:",
 		"@rive-app/react-canvas": "catalog:",
 		"@tailwindcss/aspect-ratio": "catalog:",
@@ -32,6 +33,7 @@
 		"dotenv": "catalog:",
 		"next": "catalog:",
 		"nodemailer": "catalog:",
+		"pg": "^8.23.0",
 		"pino": "catalog:",
 		"superjson": "catalog:",
 		"zod": "catalog:",
