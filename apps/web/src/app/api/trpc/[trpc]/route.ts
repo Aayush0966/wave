@@ -1,6 +1,6 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { appRouter } from "@wave/api/";
-import { createContext } from "@wave/api/context";
+import { appRouter } from "@wave/api";
+import { createContext } from "@wave/api";
 
 import type { NextRequest } from "next/server";
 

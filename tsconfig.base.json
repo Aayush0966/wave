@@ -19,11 +19,19 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"types": ["node"],
-		"paths": {
-			"@wave/ui": ["packages/ui/src"],
-			"@wave/api": ["packages/api/src"],
-			"@wave/auth": ["packages/auth/src"],
-			"@wave/db": ["packages/db/src"]
-		}
+	"paths": {
+		"@wave/ui": [
+			"packages/ui/src/index.ts"
+		],
+		"@wave/api": [
+			"packages/api/src/index.ts"
+		],
+		"@wave/auth": [
+			"packages/auth/src/index.ts"
+		],
+		"@wave/db": [
+			"packages/db/src/index.ts"
+		]
+	}
 	}
 }

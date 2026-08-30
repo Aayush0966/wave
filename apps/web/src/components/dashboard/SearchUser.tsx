@@ -40,7 +40,7 @@ const SearchUser = () => {
     return (
         <div className="p-4 max-w-md mx-auto">
             <div className="relative">
-                <SearchIcon className="-translate-y-1/2 absolute top-1/2 left-3 h-5 w-5 text-gray-400" />
+                <SearchIcon className="-translate-y-1/2 absolute top-1/2 left-3 h-5 w-5 text-gray-400" />   
                 <Input
                     placeholder="Search users..."
                     maxLength={20}
@@ -55,7 +55,7 @@ const SearchUser = () => {
                             setDropdownVisible(true);
                         }
                     }}
-                    className="!text-lg h-12 w-full rounded-xl border-2 border-gray-200 bg-white pl-10 text-gray-700 placeholder:text-gray-400 placeholder:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-background-tertiary dark:text-gray-200 dark:focus:border-blue-400"
+                    className="text-lg! h-12 w-full rounded-xl border-2 border-gray-200 bg-white pl-10 text-gray-700 placeholder:text-gray-400 placeholder:text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-background-tertiary dark:text-gray-200 dark:focus:border-blue-400"
                 />
                 {query && (
                     <XIcon
@@ -109,13 +109,11 @@ const SearchUser = () => {
                                     </div>
                                     <div>
                                         <div className="font-medium text-gray-900 dark:text-gray-100">
-                                            {user.username}
+                                            {user.name}
                                         </div>
-                                        {user.email && (
                                             <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                {user.email}
+                                                @{user.username}
                                             </div>
-                                        )}
                                     </div>
                                 </div>
 

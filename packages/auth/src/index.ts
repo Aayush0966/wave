@@ -12,7 +12,7 @@ export const auth = betterAuth<BetterAuthOptions>({
 	trustedOrigins: [process.env.CORS_ORIGIN || "", "mybettertapp://", "exp://"],
 	emailAndPassword: {
 		enabled: true,
-		requireEmailVerification:false
+		requireEmailVerification: false
 	},
 	emailVerification: {
 		sendVerificationEmail: async ({ user, url }) => {
@@ -27,8 +27,8 @@ export const auth = betterAuth<BetterAuthOptions>({
 	},
 	advanced: {
 		defaultCookieAttributes: {
-			sameSite: "none",
-			secure: true,
+			sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+			secure: process.env.NODE_ENV === "production",
 			httpOnly: true,
 		},
 	},

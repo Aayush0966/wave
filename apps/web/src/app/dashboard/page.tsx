@@ -2,6 +2,7 @@
 import ChatList from "@/components/dashboard/ChatList";
 import { auth } from "@wave/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import SearchUser from "@/components/dashboard/SearchUser";
 import { trpc } from "@/lib/trpc-server";
 import { toast } from "sonner";
@@ -10,9 +11,10 @@ export default async function Home() {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
+	console.log("Session: ", session);
 
 	if (!session) {
-		return <div>Please sign in to view your chats</div>;
+		redirect("/auth/signin");
 	}
 
 	const serverTrpc = await trpc();

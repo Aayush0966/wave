@@ -1,13 +1,24 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { Context } from "./context";
-export const t = initTRPC.context<Context>().create();
 
+export const t = initTRPC.context<Context>().create({
+	errorFormatter({ shape }) {
+		if (process.env.NODE_ENV === "development") {
+			return shape;
+		}
+
+		return {
+			...shape,
+			data: {
+				...shape.data,
+				stack: undefined,
+				cause: undefined,
+			},
+		};
+	},
+});
 export const router = t.router;
-
-
 export const publicProcedure = t.procedure;
-
-
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 	if (!ctx.session) {
 		throw new TRPCError({
