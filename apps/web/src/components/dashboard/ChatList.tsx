@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { Chat } from "@/types/chat";
 
-const ChatList = ({ chat }: { chat: Chat }) => {
+const ChatList = ({ chat, name }: { chat: Chat , name: string}) => {
 
 	const formattedTime = (time: string) => {
 		const now = new Date()
@@ -20,7 +20,7 @@ const ChatList = ({ chat }: { chat: Chat }) => {
 
 	return (
 		<div className="group mx-2 my-1 flex h-20 w-[450px] cursor-pointer items-center rounded-2xl border border-gray-200 p-4  transition-all duration-300 ease-out hover:border-gray-200 hover:bg-gray-200  dark:border-gray-800 dark:hover:border-gray-700 dark:hover:bg-background-tertiary dark:shadow-gray-900/20">
-			<div className="relative h-14 w-14 flex-shrink-0">
+			<div className="relative h-14 w-14 shrink-0">
 				<Image
 					alt="profile image"
 					src={chat.image || "/default-avatar.png"}
@@ -34,9 +34,9 @@ const ChatList = ({ chat }: { chat: Chat }) => {
 			<div className="ml-4 flex min-w-0 flex-1 flex-col justify-center space-y-1">
 				<div className="flex items-center justify-between">
 					<h3 className="truncate font-semibold font-sans text-lg text-gray-900 pb-3 leading-tight tracking-wide group-hover:text-gray-800 dark:text-text-primary dark:group-hover:text-white">
-						{chat.title ? chat.title : chat.name}
+						{chat.title ? chat.title : chat.name ? chat.name : name ? name : "Unknown"}
 					</h3>
-					<span className="ml-3 flex-shrink-0 font-medium text-gray-500 text-xs tracking-wide group-hover:text-gray-600 dark:text-text-secondary dark:group-hover:text-gray-300">
+					<span className="ml-3 shrink-0 font-medium text-gray-500 text-xs tracking-wide group-hover:text-gray-600 dark:text-text-secondary dark:group-hover:text-gray-300">
 						{chat.time ? formattedTime(chat.time) : ""}
 					</span>
 				</div>

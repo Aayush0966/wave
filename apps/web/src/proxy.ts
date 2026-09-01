@@ -17,7 +17,6 @@ export async function proxy(request: NextRequest) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  console.log("Session in proxy: ", session);
   const matchingRoute = routes.find(r => request.nextUrl.pathname.startsWith(r.path));
 
   if (matchingRoute?.type === 'protected' && !session) {

@@ -11,7 +11,6 @@ export default async function Home() {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
-	console.log("Session: ", session);
 
 	if (!session) {
 		redirect("/auth/signin");
@@ -21,7 +20,6 @@ export default async function Home() {
 	const chats = await serverTrpc.chat.getUserChats().catch((err) => {
 		toast.error("Error: ", err)
 	})
-
 
 	return (
 		<div className="flex h-screen w-full py-4">
@@ -34,7 +32,7 @@ export default async function Home() {
 							key={chat.id}
 							className="relative flex cursor-pointer items-center border-gray-100 border-b dark:border-gray-800"
 						>
-							<ChatList chat={chat} />
+							<ChatList chat={chat} name={session.user.name} />
 						</div>
 					))}
 				</div>

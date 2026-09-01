@@ -8,7 +8,7 @@ export type ChatListType = {
 	id: string;
 	image: string | null;
 	lastMessage: string;
-	name: string;
+	name: string | null;
 	lastMessageSentBy: string;
 	time: string | null;
 	unseenMessageCount: number;
@@ -24,30 +24,63 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 	return {
 		...CreteRepository(db.chat),
 		getChatBetweenUsers: async ({ user1Id, user2Id }: CreateChatParams) => {
-			return await db.chat.findFirst({
+			const chats = await db.chat.findMany({
 				where: {
 					chatParticipants: {
-						every: { userId: { in: [user1Id, user2Id] } },
+						some: {
+							userId: user1Id,
+						},
 					},
 				},
+				include: {
+					chatParticipants: true,
+				},
 			});
+
+			const chat = chats.find((c) => {
+				const participantIds = c.chatParticipants.map((p) => p.userId);
+
+				if (user1Id === user2Id) {
+					return (
+						participantIds.length === 1 &&
+						participantIds[0] === user1Id
+					);
+				}
+
+				return (
+					participantIds.length === 2 &&
+					participantIds.includes(user1Id) &&
+					participantIds.includes(user2Id)
+				);
+			});
+
+			return chat ?? null;
 		},
 		createChat: async ({ user1Id, user2Id }: CreateChatParams) => {
 			try {
+				const participantIds =
+					user1Id === user2Id
+						? [user1Id]
+						: [user1Id, user2Id];
+
 				const chat = await db.chat.create({
 					data: {
 						title: "",
 						chatParticipants: {
-							create: [{ userId: user1Id }, { userId: user2Id }],
+							create: participantIds.map((userId) => ({
+								userId,
+							})),
 						},
 					},
 					include: {
 						chatParticipants: true,
 					},
 				});
+
 				return chat;
 			} catch (error) {
 				console.log("Error while creating chat: ", error);
+
 				throw new TRPCError({
 					message: "Could not create chat",
 					code: "INTERNAL_SERVER_ERROR",
@@ -109,7 +142,7 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 					id: chat.id,
 					title: chat.title,
 					image: otherParticipant?.user.image || null,
-					name: otherParticipant?.user.name || "Unknown",
+					name: otherParticipant?.user.name || null,
 					unseenMessageCount: unseenMessageCount,
 					time: lastMessage?.createdAt?.toISOString() || null,
 					lastMessageSentBy: lastMessage?.senderId || "",
