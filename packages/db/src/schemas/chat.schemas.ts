@@ -4,6 +4,10 @@ export const userPairSchema = z.object({
 	userId: z.string().min(1, "User ID is required"),
 });
 
+export const getChatByIdSchema = z.object({
+	chatId: z.string().min(1, "Chat ID is required")
+});
+
 export const createChatSchema = userPairSchema;
 
 // Schema for service layer that expects both user IDs

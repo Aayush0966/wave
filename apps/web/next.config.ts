@@ -16,6 +16,13 @@ const nextConfig: NextConfig = {
 	cacheComponents: true,
 	typedRoutes: true,
 	transpilePackages: ["ui"],
+	turbopack: {
+		rules: {
+			"*.lottie": {
+				type: "asset",
+			},
+		},
+	},
 	webpack: (config) => {
 		config.module.rules.push({
 			test: /\.lottie$/,

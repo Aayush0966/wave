@@ -1,7 +1,8 @@
 import Image from "next/image";
 import type { Chat } from "@/types/chat";
+import {avatars} from "@wave/ui";
 
-const ChatList = ({ chat, name }: { chat: Chat , name: string}) => {
+const ChatBox = ({ chat, name }: { chat: Chat , name: string}) => {
 
 	const formattedTime = (time: string) => {
 		const now = new Date()
@@ -19,11 +20,11 @@ const ChatList = ({ chat, name }: { chat: Chat , name: string}) => {
 	}
 
 	return (
-		<div className="group mx-2 my-1 flex h-20 w-[450px] cursor-pointer items-center rounded-2xl border border-gray-200 p-4  transition-all duration-300 ease-out hover:border-gray-200 hover:bg-gray-200  dark:border-gray-800 dark:hover:border-gray-700 dark:hover:bg-background-tertiary dark:shadow-gray-900/20">
+		<div className="group mx-2 my-1 flex h-20 w-112.5 cursor-pointer items-center rounded-2xl border border-gray-200 p-4  transition-all duration-300 ease-out hover:border-gray-200 hover:bg-gray-200  dark:border-gray-800 dark:hover:border-gray-700 dark:hover:bg-background-tertiary dark:shadow-gray-900/20">
 			<div className="relative h-14 w-14 shrink-0">
 				<Image
 					alt="profile image"
-					src={chat.image || "/default-avatar.png"}
+					src={chat.image || avatars.defaultAvatar}
 					width={56}
 					height={56}
 					className="rounded-full object-cover ring-2 ring-gray-200 transition-all duration-200 group-hover:ring-gray-300  dark:ring-gray-700 dark:group-hover:ring-gray-600"
@@ -45,7 +46,7 @@ const ChatList = ({ chat, name }: { chat: Chat , name: string}) => {
 						{chat.lastMessage}
 					</p>
 					{chat.unseenMessageCount > 0 && (
-						<div className="ml-3 flex h-5 w-5 min-w-[20px] items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-600 font-semibold text-white text-xs shadow-lg transition-all duration-200 ">
+						<div className="ml-3 flex h-5 w-5 min-w-5 items-center justify-center rounded-full bg-linear-to-r from-blue-500 to-blue-600 font-semibold text-white text-xs shadow-lg transition-all duration-200 ">
 							{chat.unseenMessageCount > 99 ? "99+" : chat.unseenMessageCount}
 						</div>
 					)}
@@ -55,4 +56,4 @@ const ChatList = ({ chat, name }: { chat: Chat , name: string}) => {
 	);
 };
 
-export default ChatList;
+export default ChatBox;

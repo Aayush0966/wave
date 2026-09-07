@@ -12,7 +12,7 @@ import Link from "next/link";
 
 const Sidebar = () => {
 	const navItems = [
-		{ label: "Chats", icon: MessageCircle, route: "/dashboard" },
+		{ label: "Chats", icon: MessageCircle, route: "/dashboard/chat" },
 		{ label: "Friends", icon: Users, route: "/dashboard/friends" },
 		{ label: "Profile", icon: User, route: "/dashboard/profile" },
 		{ label: "Reports", icon: BarChart, route: "/dashboard/reports" },

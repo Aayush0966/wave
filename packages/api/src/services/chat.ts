@@ -6,6 +6,7 @@ export type ChatService = {
 	getUserChats: (
 		userId: string,
 	) => Promise<Awaited<ReturnType<ChatRepository["getUserChats"]>>>;
+	getChatById: (chatId: string, userId: string) => Promise<Awaited<ReturnType<ChatRepository["getById"]>>>;
 };
 
 export const CreateChatService = (repo: ChatRepository): ChatService => {
@@ -19,6 +20,10 @@ export const CreateChatService = (repo: ChatRepository): ChatService => {
 		async getUserChats(userId: string) {
 			const chats = await repo.getUserChats(userId);
 			return chats;
+		},
+		async getChatById(chatId: string, userId: string) {
+			const chat = await repo.getChatById({ chatId, userId });
+			return chat;
 		},
 	};
 };

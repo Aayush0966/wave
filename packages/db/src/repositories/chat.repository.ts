@@ -1,4 +1,4 @@
-import type { Chat, PrismaClient } from "@prisma/client";
+import type { Chat, PrismaClient, Message } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import type { CreateChatParams } from "../schemas/chat.schemas";
 import CreteRepository, { type Repository } from "./base.repository";
@@ -14,10 +14,40 @@ export type ChatListType = {
 	unseenMessageCount: number;
 };
 
+export type ChatDetailsType = {
+	id: string;
+	title: string;
+	chatName: string | null;
+	lastMessage: Message | null;
+	chatParticipants: {
+		userId: string;
+		user: {
+			id: string;
+			name: string | null;
+			image: string | null;
+		};
+	}[];
+	messages: {
+		id: string;
+		content: string | null;
+		senderId: string;
+		createdAt: Date | null;
+		sender: {
+			user: {
+				id: string;
+				name: string | null;
+				image: string | null;
+			}
+		};
+	}[];
+	lastMessageTime: Date | null;
+};
+
 export type ChatRepository = Repository & {
 	createChat: (params: CreateChatParams) => Promise<Chat | null>;
 	getChatBetweenUsers: (params: CreateChatParams) => Promise<Chat | null>;
 	getUserChats: (userId: string) => Promise<ChatListType[] | null>;
+	getChatById: (params: { chatId: string; userId: string }) => Promise<ChatDetailsType | null>;
 };
 
 const CreateChatRepository = (db: PrismaClient): ChatRepository => {
@@ -152,6 +182,56 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 			const chatList = await Promise.all(chatListPromises);
 			return chatList;
 		},
+		getChatById: async ({ userId, chatId }: { chatId: string; userId: string }): Promise<ChatDetailsType | null> => {
+			const chat = await db.chat.findUnique({
+				where: { id: chatId },
+				include: {
+					chatParticipants: {
+						include: {
+							user: {
+								select: {
+									id: true,
+									name: true,
+									image: true,
+								},
+							},
+						},
+					},
+					messages: {
+						orderBy: { createdAt: "desc" },
+						take: 1,
+						include: {
+							sender: {
+								include: {
+									user: {
+										select: {
+											name: true,
+											id: true,
+											image: true,
+										}
+									}
+								},
+							}
+						},
+					},
+				}
+			});
+			if (!chat) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Chat not found",
+				});
+			}
+			return {
+				id: chat.id,
+				title: chat.title,
+				chatName: chat.chatParticipants.find((p) => p.userId !== userId)?.user.name || null,
+				chatParticipants: chat.chatParticipants,
+				messages: chat.messages || [],
+				lastMessage: chat.messages[0] || null,
+				lastMessageTime: chat.messages[0]?.createdAt || null,
+			};
+		}
 	};
 };
 
