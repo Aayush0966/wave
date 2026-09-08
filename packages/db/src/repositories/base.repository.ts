@@ -1,5 +1,3 @@
-import { TRPCError } from "@trpc/server";
-
 type Model = {
 	findUnique: (args: any) => Promise<any>;
 	findMany: (args?: any) => Promise<any[]>;
@@ -31,17 +29,11 @@ const CreateRepository = (model: Model): Repository => {
 		},
 
 		update: async (id: string, data: any) => {
-			const updated = await model.update({ where: { id }, data });
-			if (!updated)
-				throw new TRPCError({ code: "NOT_FOUND", message: "Record not found" });
-			return updated;
+			return model.update({ where: { id }, data });
 		},
 
 		delete: async (id: string) => {
-			const deleted = await model.delete({ where: { id } });
-			if (!deleted)
-				throw new TRPCError({ code: "NOT_FOUND", message: "Record not found" });
-			return deleted;
+			return model.delete({ where: { id } });
 		},
 	};
 };

@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import dotenv from "dotenv";
+import errorHandlingExtension from "./errorHandling";
 
 dotenv.config({
   path: "../../.env",
@@ -20,13 +21,15 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const prisma =
+const basePrisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
     log: ["error", "info", "warn"],
   });
 
+export const prisma = basePrisma.$extends(errorHandlingExtension) as unknown as PrismaClient;
+
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+  globalForPrisma.prisma = basePrisma;
 }

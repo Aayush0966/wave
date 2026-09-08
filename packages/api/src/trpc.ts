@@ -1,4 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
+import { toDatabaseTRPCError } from "@wave/db";
 import type { Context } from "./context";
 
 export const t = initTRPC.context<Context>().create({
@@ -18,7 +19,27 @@ export const t = initTRPC.context<Context>().create({
 	},
 });
 export const router = t.router;
-export const publicProcedure = t.procedure;
+
+const databaseErrorMiddleware = t.middleware(async ({ next }) => {
+	try {
+		return await next();
+	} catch (error) {
+		if (error instanceof TRPCError) {
+			throw error;
+		}
+
+		throw (
+			toDatabaseTRPCError(error) ??
+			new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "An internal server error occurred.",
+				cause: error,
+			})
+		);
+	}
+});
+
+export const publicProcedure = t.procedure.use(databaseErrorMiddleware);
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 	if (!ctx.session) {
 		throw new TRPCError({
@@ -33,4 +54,4 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 			session: ctx.session,
 		},
 	});
-});
+}).use(databaseErrorMiddleware);

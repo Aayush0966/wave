@@ -1,5 +1,4 @@
 import type { Chat, PrismaClient, Message } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
 import type { CreateChatParams } from "../schemas/chat.schemas";
 import CreteRepository, { type Repository } from "./base.repository";
 
@@ -87,35 +86,20 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 			return chat ?? null;
 		},
 		createChat: async ({ user1Id, user2Id }: CreateChatParams) => {
-			try {
-				const participantIds =
-					user1Id === user2Id
-						? [user1Id]
-						: [user1Id, user2Id];
+			const participantIds =
+				user1Id === user2Id ? [user1Id] : [user1Id, user2Id];
 
-				const chat = await db.chat.create({
-					data: {
-						title: "",
-						chatParticipants: {
-							create: participantIds.map((userId) => ({
-								userId,
-							})),
-						},
+			return db.chat.create({
+				data: {
+					title: "",
+					chatParticipants: {
+						create: participantIds.map((userId) => ({ userId })),
 					},
-					include: {
-						chatParticipants: true,
-					},
-				});
-
-				return chat;
-			} catch (error) {
-				console.log("Error while creating chat: ", error);
-
-				throw new TRPCError({
-					message: "Could not create chat",
-					code: "INTERNAL_SERVER_ERROR",
-				});
-			}
+				},
+				include: {
+					chatParticipants: true,
+				},
+			});
 		},
 		getUserChats: async (userId: string) => {
 			const chats = await db.chat.findMany({
@@ -138,12 +122,6 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 					},
 				},
 			});
-			if (!chats)
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "No chats available for the user",
-				});
-
 			const chatListPromises = chats.map(async (chat) => {
 				const otherParticipant = chat.chatParticipants.find(
 					(p) => p.userId !== userId,
@@ -173,7 +151,7 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 					title: chat.title,
 					image: otherParticipant?.user.image || null,
 					name: otherParticipant?.user.name || null,
-					unseenMessageCount: unseenMessageCount,
+					unseenMessageCount,
 					time: lastMessage?.createdAt?.toISOString() || null,
 					lastMessageSentBy: lastMessage?.senderId || "",
 					lastMessage: lastMessage?.content || "",
@@ -183,7 +161,7 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 			return chatList;
 		},
 		getChatById: async ({ userId, chatId }: { chatId: string; userId: string }): Promise<ChatDetailsType | null> => {
-			const chat = await db.chat.findUnique({
+			const chat = await db.chat.findUniqueOrThrow({
 				where: { id: chatId },
 				include: {
 					chatParticipants: {
@@ -216,18 +194,12 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 					},
 				}
 			});
-			if (!chat) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Chat not found",
-				});
-			}
 			return {
 				id: chat.id,
 				title: chat.title,
 				chatName: chat.chatParticipants.find((p) => p.userId !== userId)?.user.name || null,
 				chatParticipants: chat.chatParticipants,
-				messages: chat.messages || [],
+				messages: chat.messages,
 				lastMessage: chat.messages[0] || null,
 				lastMessageTime: chat.messages[0]?.createdAt || null,
 			};

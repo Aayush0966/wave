@@ -634,6 +634,9 @@ importers:
       '@prisma/client':
         specifier: 'catalog:'
         version: 7.7.0(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2))(typescript@6.0.2)
+      '@trpc/server':
+        specifier: 'catalog:'
+        version: 11.16.0(typescript@6.0.2)
       dotenv:
         specifier: 'catalog:'
         version: 17.4.1

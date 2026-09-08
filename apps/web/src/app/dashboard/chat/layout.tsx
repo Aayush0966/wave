@@ -35,14 +35,14 @@ export default async function RootLayout({
     <div className="flex h-screen w-full gap-4 overflow-hidden bg-background-primary">
       <main className="flex h-screen w-full overflow-hidden rounded-3xl bg-white dark:bg-background-secondary">
         <div className="flex h-screen w-full">
-          <div className="w-full max-w-md border-gray-200 border-r dark:border-gray-700">
+          <div className="w-full max-w-md border-gray-200 border-r dark:border-gray-500">
             <SearchUser />
             <div className="overflow-y-auto">
               {chats?.map((chat) => (
                 <Link
                   href={`/dashboard/chat/${chat.id}`}
                   key={chat.id}
-                  className="relative flex cursor-pointer items-center border-gray-100 border-b dark:border-gray-800"
+                  className="relative flex cursor-pointer items-center border-gray-100 border-b dark:border-gray-500"
                 >
                   <ChatBox chat={chat} name={session.user.name} />
                 </Link>

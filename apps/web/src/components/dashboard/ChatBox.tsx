@@ -20,7 +20,7 @@ const ChatBox = ({ chat, name }: { chat: Chat , name: string}) => {
 	}
 
 	return (
-		<div className="group mx-2 my-1 flex h-20 w-112.5 cursor-pointer items-center rounded-2xl border border-gray-200 p-4  transition-all duration-300 ease-out hover:border-gray-200 hover:bg-gray-200  dark:border-gray-800 dark:hover:border-gray-700 dark:hover:bg-background-tertiary dark:shadow-gray-900/20">
+		<div className="group mx-2 my-1 flex h-20 w-112.5 cursor-pointer items-center rounded-2xl border border-gray-200 p-4  transition-all duration-300 ease-out hover:border-gray-200 hover:bg-gray-200  dark:border-gray-500 dark:hover:border-gray-700 dark:hover:bg-background-tertiary dark:shadow-gray-900/20">
 			<div className="relative h-14 w-14 shrink-0">
 				<Image
 					alt="profile image"
