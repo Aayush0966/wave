@@ -5,7 +5,9 @@
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
-		"lib": ["ESNext"],
+		"lib": [
+			"ESNext"
+		],
 		"verbatimModuleSyntax": true,
 		"strict": true,
 		"skipLibCheck": true,
@@ -18,20 +20,25 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"types": ["node"],
-	"paths": {
-		"@wave/ui": [
-			"packages/ui/src/index.ts"
+		"types": [
+			"node"
 		],
-		"@wave/api": [
-			"packages/api/src/index.ts"
-		],
-		"@wave/auth": [
-			"packages/auth/src/index.ts"
-		],
-		"@wave/db": [
-			"packages/db/src/index.ts"
-		]
-	}
+		"paths": {
+			"@wave/ui": [
+				"packages/ui/src/index.ts"
+			],
+			"@wave/api": [
+				"packages/api/src/index.ts"
+			],
+			"@wave/auth": [
+				"packages/auth/src/index.ts"
+			],
+			"@wave/db": [
+				"packages/db/src/index.ts"
+			],
+			"@wave/state": [
+				"packages/state/src/index.ts"
+			]
+		}
 	}
 }

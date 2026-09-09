@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/index.css";
-import ChatBox from "@/components/dashboard/ChatBox";
+import ChatBox from "@/components/dashboard/chat/ChatBox";
 import { auth } from "@wave/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";

@@ -3,6 +3,7 @@ model Message {
     messageType MessageType     @default(TEXT)
     senderId    String
     sender      ChatParticipant @relation(fields: [senderId], references: [id])
+    messageStatus MessageStatus   @default(PENDING)
     content     String?
     chatId      String
     chat        Chat            @relation(fields: [chatId], references: [id])
@@ -56,4 +57,11 @@ model React {
     reactedBy   ChatParticipant @relation(fields: [reactedById], references: [id])
 
     @@unique([reactedById, messageId])
+}
+
+enum MessageStatus {
+    PENDING
+    SENT
+    DELIVERED
+    READ
 }

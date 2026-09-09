@@ -17,6 +17,7 @@
 		"@wave/api": "workspace:*",
 		"@wave/auth": "workspace:*",
 		"@wave/db": "workspace:*",
+		"@wave/state": "workspace:*",
 		"better-auth": "catalog:",
 		"class-variance-authority": "catalog:",
 		"clsx": "catalog:",

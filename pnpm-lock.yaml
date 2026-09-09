@@ -247,7 +247,7 @@ catalogs:
       specifier: ^4.3.6
       version: 4.3.6
     zustand:
-      specifier: ^5.0.12
+      specifier: 5.0.12
       version: 5.0.12
 
 importers:
@@ -305,9 +305,6 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 4.3.6
-      zustand:
-        specifier: 'catalog:'
-        version: 5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
     devDependencies:
       '@biomejs/biome':
         specifier: 'catalog:'
@@ -508,6 +505,9 @@ importers:
       '@wave/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@wave/state':
+        specifier: workspace:*
+        version: link:../../packages/state
       better-auth:
         specifier: 'catalog:'
         version: 1.6.2(@opentelemetry/api@1.9.1)(@prisma/client@7.7.0(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2))(typescript@6.0.2))(mysql2@3.15.3)(next@16.2.3(@opentelemetry/api@1.9.1)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(pg@8.23.0)(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(vitest@4.1.4(@opentelemetry/api@1.9.1)(@types/node@25.5.2)(vite@7.3.2(@types/node@25.5.2)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.23.12)(yaml@2.8.3)))
@@ -653,6 +653,19 @@ importers:
       tsdown:
         specifier: 'catalog:'
         version: 0.21.7(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(synckit@0.11.12)(typescript@6.0.2)
+
+  packages/state:
+    dependencies:
+      zustand:
+        specifier: 'catalog:'
+        version: 5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
+    devDependencies:
+      tsdown:
+        specifier: 'catalog:'
+        version: 0.21.7(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(synckit@0.11.12)(typescript@6.0.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
 
   packages/ui:
     devDependencies:
@@ -11951,7 +11964,9 @@ snapshots:
       metro-runtime: 0.84.2
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 

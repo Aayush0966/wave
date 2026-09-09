@@ -1,0 +1,28 @@
+{
+	"name": "@wave/state",
+	"version": "1.0.0",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"types": "./dist/*.d.ts",
+			"default": "./src/*.ts"
+		}
+	},
+	"type": "module",
+	"scripts": {
+		"build": "tsdown"
+	},
+	"devDependencies": {
+		"tsdown": "catalog:",
+		"typescript": "catalog:"
+	},
+	"dependencies": {
+		"zustand": "catalog:"
+	},
+	"peerDependencies": {
+		"typescript": "^5 || ^6"
+	}
+}

@@ -1,7 +1,9 @@
-import type { PrismaClient } from "@prisma/client"
-import createRepository from "./base.repository"
+import type { Message, PrismaClient } from "@prisma/client"
+import createRepository, { type Repository } from "./base.repository"
 
-
+export type MessageRepository = Repository & {
+  getMessagesByChatId: (chatId: string) => Promise<Message[] | null>;
+}
 
 export const createMessageRepository = (db: PrismaClient) => {
   return {
@@ -12,17 +14,7 @@ export const createMessageRepository = (db: PrismaClient) => {
         orderBy: { createdAt: "asc" },
       })
       return messages
-    },
-    async createMessage({ chatId, senderId, content }: { chatId: string; senderId: string; content: string }) {
-      const message = await db.message.create({
-        data: {
-          chatId,
-          senderId,
-          content,
-        },
-      })
-      return message
-    },
+    }
 
   }
 }

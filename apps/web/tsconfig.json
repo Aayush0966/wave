@@ -41,6 +41,9 @@
 			],
 			"@wave/db": [
 				"../../packages/db/src"
+			],
+			"@wave/state": [
+				"../../packages/state/src"
 			]
 		}
 	},
