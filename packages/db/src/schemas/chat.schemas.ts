@@ -5,7 +5,7 @@ export const userPairSchema = z.object({
 });
 
 export const getChatByIdSchema = z.object({
-	chatId: z.string().min(1, "Chat ID is required")
+	chatId: z.string().min(1, "Chat ID is required"),
 });
 
 export const createChatSchema = userPairSchema;

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHydrationHelpers } from "@trpc/react-query/rsc";
+import { repos } from "@wave/api";
 import { appRouter } from "@wave/api/routers/_app";
 import { auth } from "@wave/auth";
 import { headers } from "next/headers";
@@ -17,7 +18,7 @@ const createServerTrpc = async () => {
 		headers: await headers(),
 	});
 
-	const context = { session };
+	const context = { session, repos };
 	const caller = appRouter.createCaller(context);
 
 	return caller;
@@ -27,7 +28,7 @@ const createServerTrpc = async () => {
 export const trpc = cache(createServerTrpc);
 
 // For hydration helpers, we need a caller without context for client-side hydration
-const dummyContext = { session: null };
+const dummyContext = { session: null, repos };
 const dummyCaller = appRouter.createCaller(dummyContext);
 
 export const { HydrateClient } = createHydrationHelpers<typeof appRouter>(

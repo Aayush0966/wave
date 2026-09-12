@@ -10,7 +10,8 @@ export const toDatabaseTRPCError = (error: unknown): TRPCError | undefined => {
 		case "P2002":
 			return new TRPCError({
 				code: "CONFLICT",
-				message: "Duplicate value detected for a field which expects unique values.",
+				message:
+					"Duplicate value detected for a field which expects unique values.",
 				cause: error,
 			});
 		case "P2025":

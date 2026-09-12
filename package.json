@@ -8,7 +8,6 @@
 	],
 	"scripts": {
 		"check": "biome check --write .",
-		"prepare": "husky",
 		"dev": "turbo dev",
 		"build": "turbo build",
 		"check-types": "turbo check-types",
@@ -45,19 +44,12 @@
 		"@testing-library/react": "catalog:",
 		"@types/node": "catalog:",
 		"@types/nodemailer": "catalog:",
-		"husky": "catalog:",
-		"lint-staged": "catalog:",
 		"tailwindcss": "catalog:",
 		"ts-node": "catalog:",
 		"tsdown": "catalog:",
 		"tsx": "^4.23.12",
 		"turbo": "catalog:",
 		"vitest": "catalog:"
-	},
-	"lint-staged": {
-		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
-			"biome check --write ."
-		]
 	},
 	"packageManager": "pnpm@10.17.1"
 }

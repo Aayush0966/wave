@@ -1,11 +1,7 @@
-import type { PrismaClient, User } from "@prisma/client";
-import CreateRepository, { type Repository } from "./base.repository";
+import type { PrismaClient } from "@prisma/client";
+import CreateRepository from "./base.repository";
 
-export type UserRepository = Repository & {
-	getByUsername: (username: string) => Promise<User[] | null>;
-};
-
-export const CreateUserRepository = (db: PrismaClient): UserRepository => {
+export const CreateUserRepository = (db: PrismaClient) => {
 	return {
 		...CreateRepository(db.user),
 		getByUsername: (username: string) => {

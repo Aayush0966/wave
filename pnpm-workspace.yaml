@@ -51,9 +51,7 @@ catalog:
   expo-status-bar: ~55.0.5
   expo-system-ui: ~55.0.15
   expo-web-browser: ~55.0.14
-  husky: ^9.1.7
   jest: ^30.3.0
-  lint-staged: ^16.4.0
   lucide-react: ^1.8.0
   nativewind: ^4.2.3
   next: ^16.2.3

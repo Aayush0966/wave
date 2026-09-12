@@ -40,18 +40,20 @@ const databaseErrorMiddleware = t.middleware(async ({ next }) => {
 });
 
 export const publicProcedure = t.procedure.use(databaseErrorMiddleware);
-export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-	if (!ctx.session) {
-		throw new TRPCError({
-			code: "UNAUTHORIZED",
-			message: "Authentication required",
-			cause: "No session",
+export const protectedProcedure = t.procedure
+	.use(({ ctx, next }) => {
+		if (!ctx.session) {
+			throw new TRPCError({
+				code: "UNAUTHORIZED",
+				message: "Authentication required",
+				cause: "No session",
+			});
+		}
+		return next({
+			ctx: {
+				...ctx,
+				session: ctx.session,
+			},
 		});
-	}
-	return next({
-		ctx: {
-			...ctx,
-			session: ctx.session,
-		},
-	});
-}).use(databaseErrorMiddleware);
+	})
+	.use(databaseErrorMiddleware);

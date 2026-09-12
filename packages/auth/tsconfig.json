@@ -1,12 +1,10 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"ignoreDeprecations": "6.0",
 		"jsx": "react",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
-		"baseUrl": "./",
 		"outDir": "dist",
 		"composite": true
 	}

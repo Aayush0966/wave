@@ -1,11 +1,5 @@
-import { CreateChatRepository, createChatSchema, prisma, getChatByIdSchema } from "@wave/db";
+import { createChatSchema, getChatByIdSchema } from "@wave/db";
 import { protectedProcedure, router } from "../trpc";
-import { CreateChatService } from "../services/chat";
-
-const chatRepo = CreateChatRepository(prisma);
-const chatService = CreateChatService(chatRepo);
-
-
 
 export const chat = router({
 	createChat: protectedProcedure
@@ -14,20 +8,28 @@ export const chat = router({
 			const sessionUserId = ctx.session.user.id;
 			const targetUserId = input.userId;
 
-			return await chatService.createChat({
+			const existingChat = await ctx.repos.chat.getChatBetweenUsers({
 				user1Id: sessionUserId,
-				user2Id: targetUserId
+				user2Id: targetUserId,
+			});
+			if (existingChat) return existingChat;
+
+			return await ctx.repos.chat.createChat({
+				user1Id: sessionUserId,
+				user2Id: targetUserId,
 			});
 		}),
 
-	getUserChats: protectedProcedure
-		.query(async ({ ctx }) => {
-			const userId = ctx.session.user.id
-			return await chatService.getUserChats(userId)
+	getUserChats: protectedProcedure.query(async ({ ctx }) => {
+		return await ctx.repos.chat.getUserChats(ctx.session.user.id);
+	}),
+
+	getChatById: protectedProcedure
+		.input(getChatByIdSchema)
+		.query(async ({ input, ctx }) => {
+			return await ctx.repos.chat.getChatById({
+				chatId: input.chatId,
+				userId: ctx.session.user.id,
+			});
 		}),
-	getChatById: protectedProcedure.
-		input(getChatByIdSchema).
-		query(async ({ input, ctx }) => { 
-			return await chatService.getChatById(input.chatId, ctx.session.user.id);
-		})
 });

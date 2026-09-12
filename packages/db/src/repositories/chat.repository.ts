@@ -1,6 +1,6 @@
-import type { Chat, PrismaClient, Message } from "@prisma/client";
+import type { Message, PrismaClient } from "@prisma/client";
 import type { CreateChatParams } from "../schemas/chat.schemas";
-import CreteRepository, { type Repository } from "./base.repository";
+import CreteRepository from "./base.repository";
 
 export type ChatListType = {
 	title: string;
@@ -36,20 +36,13 @@ export type ChatDetailsType = {
 				id: string;
 				name: string | null;
 				image: string | null;
-			}
+			};
 		};
 	}[];
 	lastMessageTime: Date | null;
 };
 
-export type ChatRepository = Repository & {
-	createChat: (params: CreateChatParams) => Promise<Chat | null>;
-	getChatBetweenUsers: (params: CreateChatParams) => Promise<Chat | null>;
-	getUserChats: (userId: string) => Promise<ChatListType[] | null>;
-	getChatById: (params: { chatId: string; userId: string }) => Promise<ChatDetailsType | null>;
-};
-
-const CreateChatRepository = (db: PrismaClient): ChatRepository => {
+const CreateChatRepository = (db: PrismaClient) => {
 	return {
 		...CreteRepository(db.chat),
 		getChatBetweenUsers: async ({ user1Id, user2Id }: CreateChatParams) => {
@@ -70,10 +63,7 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 				const participantIds = c.chatParticipants.map((p) => p.userId);
 
 				if (user1Id === user2Id) {
-					return (
-						participantIds.length === 1 &&
-						participantIds[0] === user1Id
-					);
+					return participantIds.length === 1 && participantIds[0] === user1Id;
 				}
 
 				return (
@@ -160,7 +150,13 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 			const chatList = await Promise.all(chatListPromises);
 			return chatList;
 		},
-		getChatById: async ({ userId, chatId }: { chatId: string; userId: string }): Promise<ChatDetailsType | null> => {
+		getChatById: async ({
+			userId,
+			chatId,
+		}: {
+			chatId: string;
+			userId: string;
+		}): Promise<ChatDetailsType | null> => {
 			const chat = await db.chat.findUniqueOrThrow({
 				where: { id: chatId },
 				include: {
@@ -186,24 +182,26 @@ const CreateChatRepository = (db: PrismaClient): ChatRepository => {
 											name: true,
 											id: true,
 											image: true,
-										}
-									}
+										},
+									},
 								},
-							}
+							},
 						},
 					},
-				}
+				},
 			});
 			return {
 				id: chat.id,
 				title: chat.title,
-				chatName: chat.chatParticipants.find((p) => p.userId !== userId)?.user.name || null,
+				chatName:
+					chat.chatParticipants.find((p) => p.userId !== userId)?.user.name ||
+					null,
 				chatParticipants: chat.chatParticipants,
 				messages: chat.messages,
 				lastMessage: chat.messages[0] || null,
 				lastMessageTime: chat.messages[0]?.createdAt || null,
 			};
-		}
+		},
 	};
 };
 

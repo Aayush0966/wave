@@ -6,15 +6,7 @@ type Model = {
 	delete: (args: any) => Promise<any>;
 };
 
-export type Repository = {
-	getById: (id: string) => Promise<any>;
-	getAll: () => Promise<any>;
-	create: (data: any) => Promise<any>;
-	update: (id: string, data: any) => Promise<any>;
-	delete: (id: string) => Promise<any>;
-};
-
-const CreateRepository = (model: Model): Repository => {
+const CreateRepository = (model: Model) => {
 	return {
 		getById: async (id: string) => {
 			return model.findUnique({ where: { id } });
