@@ -18,7 +18,8 @@ export type Message = {
   senderId: string;
   content: string | null;
   chatId: string;
-  messageStatus: "PENDING" | "SENT" | "DELIVERED" | "READ";
+  messageStatus: "PENDING" | "SENT" | "DELIVERED";
+  seenBy?: string[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -32,6 +33,8 @@ type ChatStore = {
   sendMessage: (message: Message) => void;
   addMessage: (message: Message) => void;
   replaceMessage: (message: Message, tempId: string) => void;
+  markMessageAsSeen: (messageId: string, chatParticipantId: string) => void;
+  markAllMessagesAsSeen: (chatId: string, chatParticipantId: string) => void;
 };
 
 export const useChatStore = create<ChatStore>()(
@@ -71,6 +74,44 @@ export const useChatStore = create<ChatStore>()(
             message.id,
           ],
         },
+      });
+    },
+    markMessageAsSeen: (messageId: string, chatParticipantId: string) => {
+      set((state) => {
+        const message = state.messagesById[messageId];
+        if (!message) return state;
+
+        const updatedMessage = {
+          ...message,
+          seenBy: [...(message.seenBy ?? []), chatParticipantId],
+        };
+
+        return {
+          messagesById: {
+            ...state.messagesById,
+            [messageId]: updatedMessage,
+          },
+        };
+      });
+    },
+    markAllMessagesAsSeen: (chatId: string, chatParticipantId: string) => {
+      set((state) => {
+        const messageIds = state.chatMessages[chatId] ?? [];
+        const updatedMessagesById = { ...state.messagesById };
+
+        messageIds.forEach((messageId) => {
+          const message = updatedMessagesById[messageId];
+          if (message && !message.seenBy?.includes(chatParticipantId)) {
+            updatedMessagesById[messageId] = {
+              ...message,
+              seenBy: [...(message.seenBy ?? []), chatParticipantId],
+            };
+          }
+        });
+
+        return {
+          messagesById: updatedMessagesById,
+        };
       });
     },
   })),

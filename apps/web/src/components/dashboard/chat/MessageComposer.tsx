@@ -5,7 +5,7 @@ import { useRef } from "react";
 import type { Message } from "@prisma/client";
 
 type MessageComposerProps = {
-  action: (formData: FormData) => Promise<Message | undefined | null>;
+  action: (formData: FormData) => Promise<Message | null | undefined>;
   chatId: string;
   senderId: string;
 };

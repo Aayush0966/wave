@@ -1,19 +1,25 @@
+"use client";
 import { Check, CheckCheck, Clock3 } from "lucide-react";
-import type { Message as PrismaMessage } from "@prisma/client";
+import type { Message as PrismaMessage, MessageSeen } from "@prisma/client";
+
+type MessageWithOptionalSeen = PrismaMessage & {
+  seenBy?: MessageSeen[] | string[];
+};
 
 type MessageProps = {
-  message: PrismaMessage;
+  message: MessageWithOptionalSeen;
   currentUserId: string;
 };
 
 const Message = ({ message, currentUserId }: MessageProps) => {
+  const createdAt = new Date(message.createdAt);
   const isOwnMessage = message.senderId === currentUserId;
   const status = {
     PENDING: { label: "Pending", icon: Clock3, className: "text-emerald-100" },
     SENT: { label: "Sent", icon: Check, className: "text-emerald-100" },
     DELIVERED: { label: "Delivered", icon: CheckCheck, className: "text-emerald-100" },
-    READ: { label: "Seen", icon: CheckCheck, className: "text-sky-200" },
-  }[message.messageStatus];
+    SEEN: { label: "Seen", icon: CheckCheck, className: "text-blue-300" },
+  }[(message.seenBy?.length ?? 0) > 0 ? "SEEN" : message.messageStatus];
   const StatusIcon = status.icon;
 
   return (
@@ -28,8 +34,8 @@ const Message = ({ message, currentUserId }: MessageProps) => {
           {message.content || "Attachment"}
         </p>
         <div className={`mt-1 flex items-center justify-end gap-1 text-[11px] ${isOwnMessage ? "text-emerald-100" : "text-gray-500 dark:text-gray-400"}`}>
-          <time dateTime={message.createdAt.toISOString()}>
-            {message.createdAt.toLocaleTimeString([], {
+          <time dateTime={createdAt.toISOString()}>
+            {createdAt.toLocaleTimeString([], {
               hour: "numeric",
               minute: "2-digit",
             })}

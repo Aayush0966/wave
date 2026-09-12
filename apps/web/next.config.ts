@@ -3,7 +3,11 @@ import dotenv from "dotenv";
 import type { NextConfig } from "next";
 
 dotenv.config({
+	path: path.resolve(import.meta.dirname, "../../.env"),
+});
+dotenv.config({
 	path: path.resolve(import.meta.dirname, "../../.env.local"),
+	override: true,
 });
 
 const nextConfig: NextConfig = {
