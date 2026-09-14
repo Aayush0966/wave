@@ -14,11 +14,6 @@ export const getMessagesByChatIdSchema = z.object({
 	offset: z.number().optional(),
 });
 
-export const createMessageSeenSchema = z.object({
-	messageId: z.string().min(1),
-	chatParticipantId: z.string().min(1),
-	chatId: z.string().min(1),
-});
 
 export const createManyMessageSeenSchema = z.object({
 	messageIds: z.array(z.string().min(1)).min(1),

@@ -1,10 +1,6 @@
 "use client";
-import type { Prisma } from "@prisma/client";
+import type { MessageFull } from "@wave/db";
 import { Check, CheckCheck, Clock3 } from "lucide-react";
-
-type MessageFull = Prisma.MessageGetPayload<{
-	include: { seenBy: true; reacts: true; deletedBy: true };
-}>;
 
 type MessageProps = {
 	message: MessageFull;

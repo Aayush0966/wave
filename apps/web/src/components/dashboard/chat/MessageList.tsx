@@ -1,20 +1,18 @@
 "use client";
 
-import type { Message as MessageType } from "@prisma/client";
-import { useChatStore } from "@wave/state";
-import { useEffect, useMemo, useRef } from "react";
-import { pusherClient } from "@/lib/pusher-client";
-import { trpc } from "@/lib/trpc-client";
+import { useEffect, useRef } from "react";
 import GhostAnimation from "../GhostAnimation";
 import Message from "./Message";
+import type { MessageFull } from "@wave/db";
+import { useChatMessages } from "@wave/state";
+import { useChatRoom } from "../../../hooks/useChatRoom";
 
 type MessageListType = {
-	initialMessages: MessageType[];
+	initialMessages: MessageFull[];
 	senderId: string;
 	chatId: string;
 };
 
-const EMPTY_MESSAGE_IDS: string[] = [];
 
 const MessageList = ({
 	initialMessages,
@@ -22,70 +20,8 @@ const MessageList = ({
 	chatId,
 }: MessageListType) => {
 	const bottomRef = useRef<HTMLDivElement>(null);
-	const messageIds = useChatStore(
-		(state) => state.chatMessages[chatId] ?? EMPTY_MESSAGE_IDS,
-	);
-	const messagesById = useChatStore((state) => state.messagesById);
-
-	const storeMessages = useMemo(() => {
-		return messageIds
-			.map((messageId) => messagesById[messageId])
-			.filter((message): message is NonNullable<typeof message> =>
-				Boolean(message),
-			);
-	}, [messageIds, messagesById]);
-
-	// Merge initial and store messages while removing duplicates by message ID
-	const messages = useMemo(() => {
-		const combined = [...initialMessages, ...storeMessages];
-		const map = new Map<string, MessageType>();
-		combined.forEach((msg) => map.set(msg.id, msg));
-		return Array.from(map.values());
-	}, [initialMessages, storeMessages]);
-
-	const markMessageAsSeen = trpc.message.createMessageSeen.useMutation();
-
-	useEffect(() => {
-		const channelName = `chat-${chatId}`;
-		const channel = pusherClient.subscribe(channelName);
-
-		const handleNewMessage = (message: MessageType) => {
-			if (message.senderId === senderId) return; // ignore self-sent messages
-
-			useChatStore.getState().addMessage(message);
-		};
-
-		const handleMessageSeen = (data: {
-			messageId: string;
-			chatParticipantId: string;
-		}) => {
-			if (data.chatParticipantId === senderId) return; // ignore self-seen messages
-			useChatStore
-				.getState()
-				.markMessageAsSeen(data.messageId, data.chatParticipantId);
-		};
-		const handleMessagesSeen = (data: {
-			messageIds: string[];
-			chatParticipantId: string;
-		}) => {
-			if (data.chatParticipantId === senderId) return; // ignore self-seen messages
-			useChatStore
-				.getState()
-				.markAllMessagesAsSeen(chatId, data.chatParticipantId);
-		};
-
-		channel.bind("new-message", handleNewMessage);
-		channel.bind("message-seen", handleMessageSeen);
-		channel.bind("messages-seen", handleMessagesSeen);
-
-		return () => {
-			channel.unbind("new-message", handleNewMessage);
-			channel.unbind("message-seen", handleMessageSeen);
-			channel.unbind("messages-seen", handleMessageSeen);
-			pusherClient.unsubscribe(channelName);
-		};
-	}, [chatId, senderId]);
-
+	 const messages = useChatMessages(chatId,initialMessages);
+	useChatRoom(chatId,senderId, messages);
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages.length]);

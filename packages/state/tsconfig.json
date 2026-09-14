@@ -8,5 +8,6 @@
 		"composite": true
 	},
 	"include": ["src/**/*.ts"],
+	"references": [{ "path": "../db" }],
 	"exclude": ["node_modules", "dist"]
 }

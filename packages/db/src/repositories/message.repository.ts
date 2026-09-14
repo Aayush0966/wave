@@ -1,9 +1,5 @@
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import createRepository from "./base.repository";
-
-export type MessageFull = Prisma.MessageGetPayload<{
-	include: { seenBy: true; reacts: true; deletedBy: true };
-}>;
 
 export const createMessageRepository = (db: PrismaClient) => {
 	return {
@@ -25,19 +21,11 @@ export const createMessageRepository = (db: PrismaClient) => {
 				),
 			}));
 		},
-		async createMessageSeen(messageId: string, chatParticipantId: string) {
-			return await db.messageSeen.create({
-				data: {
-					messageId,
-					chatParticipantId,
-				},
-			});
-		},
 		async createManyMessageSeen(
 			messageIds: string[],
 			chatParticipantId: string,
 		) {
-			return await db.messageSeen.createMany({
+			return await db.messageSeen.createManyAndReturn({
 				data: messageIds.map((messageId) => ({
 					messageId,
 					chatParticipantId,

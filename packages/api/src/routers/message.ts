@@ -1,8 +1,8 @@
 import {
 	createManyMessageSeenSchema,
 	createMessageSchema,
-	createMessageSeenSchema,
 	getMessagesByChatIdSchema,
+	type MessageFull,
 } from "@wave/db";
 import { pusherServer } from "../pusher-server";
 import { protectedProcedure, router } from "../trpc";
@@ -13,15 +13,22 @@ export const message = router({
 		.mutation(async ({ input, ctx }) => {
 			const { chatId, content, messageType, senderId, messageStatus } = input;
 
-			const message = await ctx.repos.message.create({
+			const createdMessage = await ctx.repos.message.create({
 				chatId,
 				senderId,
 				content: content ?? null,
 				messageType,
 				messageStatus,
 			});
-			await pusherServer.trigger(`chat-${chatId}`, "new-message", message);
-			return message;
+
+			const fullMessage: MessageFull = {
+				...createdMessage,
+				seenBy: [],
+				reacts: [],
+				deletedBy: [],
+			};
+			await pusherServer.trigger(`chat-${chatId}`, "new-message", fullMessage);
+			return fullMessage;
 		}),
 	getMessagesByChatId: protectedProcedure
 		.input(getMessagesByChatIdSchema)
@@ -30,32 +37,29 @@ export const message = router({
 
 			return ctx.repos.message.getMessagesByChatId(chatId);
 		}),
-	createMessageSeen: protectedProcedure
-		.input(createMessageSeenSchema)
-		.mutation(async ({ input, ctx }) => {
-			const { messageId, chatParticipantId, chatId } = input;
-			const message = await ctx.repos.message.createMessageSeen(
-				messageId,
-				chatParticipantId,
-			);
-			await pusherServer.trigger(`chat-${chatId}`, "message-seen", {
-				messageId,
-				chatParticipantId,
-			});
-			return message;
-		}),
+	// createMessageSeen: protectedProcedure
+	// 	.input(createMessageSeenSchema)
+	// 	.mutation(async ({ input, ctx }) => {
+	// 		const { messageId, chatParticipantId, chatId } = input;
+	// 		const message = await ctx.repos.message.createMessageSeen(
+	// 			messageId,
+	// 			chatParticipantId,
+	// 		);
+	// 		await pusherServer.trigger(`chat-${chatId}`, "message-seen", {
+	// 			message
+	// 		});
+	// 		return message;
+	// 	}),
 	createManyMessageSeen: protectedProcedure
 		.input(createManyMessageSeenSchema)
 		.mutation(async ({ input, ctx }) => {
 			const { messageIds, chatParticipantId, chatId } = input;
-			const message = await ctx.repos.message.createManyMessageSeen(
+			const messages = await ctx.repos.message.createManyMessageSeen(
 				messageIds,
 				chatParticipantId,
 			);
-			await pusherServer.trigger(`chat-${chatId}`, "messages-seen", {
-				messageIds,
-				chatParticipantId,
-			});
-			return message;
-		}),
+			await pusherServer.trigger(`chat-${chatId}`, "messages-seen", messages
+			);
+			return messages;
+		}), 
 });

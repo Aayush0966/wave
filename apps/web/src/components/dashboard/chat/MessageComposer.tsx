@@ -1,11 +1,11 @@
 "use client";
-import type { Message } from "@prisma/client";
+import type { MessageFull } from "@wave/db";
 import { useChatStore } from "@wave/state";
 import { ImageIcon, Mic, Paperclip, Send } from "lucide-react";
 import { useRef } from "react";
 
 type MessageComposerProps = {
-	action: (formData: FormData) => Promise<Message | null | undefined>;
+	action: (formData: FormData) => Promise<MessageFull | null | undefined>;
 	chatId: string;
 	senderId: string;
 };
@@ -20,10 +20,13 @@ const MessageComposer = ({
 	const replaceMessage = useChatStore((state) => state.replaceMessage);
 
 	const handleMessageSubmit = async (formData: FormData) => {
+		const content = String(formData.get("content") ?? "").trim();
+		if (!content) return;
+		formRef.current?.reset();
 		const now = new Date();
 		const temporaryMessageId = crypto.randomUUID();
 		sendMessage({
-			content: String(formData.get("content") ?? "").trim(),
+			content: content,
 			chatId,
 			senderId,
 			messageType: "TEXT",
@@ -31,6 +34,9 @@ const MessageComposer = ({
 			messageStatus: "PENDING",
 			createdAt: now,
 			updatedAt: now,
+			seenBy: [],
+			reacts: [],
+			deletedBy: [],
 		});
 		const message = await action(formData);
 		message && replaceMessage(message, temporaryMessageId);

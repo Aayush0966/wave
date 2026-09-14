@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import type { MessageFull } from "@wave/db";
+import type { MessageSeen } from "@prisma/client";
 
 export type Chat = {
 	id: string;
@@ -12,29 +14,18 @@ export type Chat = {
 	unseenMessageCount: number;
 };
 
-export type Message = {
-	id: string;
-	messageType: "TEXT" | "ATTACHMENT" | "IMAGE" | "VIDEO";
-	senderId: string;
-	content: string | null;
-	chatId: string;
-	messageStatus: "PENDING" | "SENT" | "DELIVERED";
-	seenBy?: string[];
-	createdAt: Date;
-	updatedAt: Date;
-};
 
 type ChatStore = {
 	chats: Chat[];
 	setChats: (chats: Chat[]) => void;
 	addChat: (chat: Chat) => void;
-	messagesById: Record<string, Message>;
+	messagesById: Record<string, MessageFull>;
 	chatMessages: Record<string, string[]>;
-	sendMessage: (message: Message) => void;
-	addMessage: (message: Message) => void;
-	replaceMessage: (message: Message, tempId: string) => void;
-	markMessageAsSeen: (messageId: string, chatParticipantId: string) => void;
-	markAllMessagesAsSeen: (chatId: string, chatParticipantId: string) => void;
+	sendMessage: (message: MessageFull) => void;
+	addMessage: (message: MessageFull) => void;
+	replaceMessage: (message: MessageFull, tempId: string) => void;
+	markMessageAsSeen: (seenRecord: MessageSeen) => void;
+	markAllMessagesAsSeen: (seenRecord: MessageSeen[]) => void;
 };
 
 export const useChatStore = create<ChatStore>()(
@@ -76,39 +67,46 @@ export const useChatStore = create<ChatStore>()(
 				},
 			});
 		},
-		markMessageAsSeen: (messageId: string, chatParticipantId: string) => {
+		markMessageAsSeen: (seenRecord: MessageSeen) => {
 			set((state) => {
-				const message = state.messagesById[messageId];
+				const message = state.messagesById[seenRecord.messageId];
 				if (!message) return state;
-
-				const updatedMessage = {
-					...message,
-					seenBy: [...(message.seenBy ?? []), chatParticipantId],
-				};
-
+				const alreadySeen = message.seenBy.some(
+					(s) => s.chatParticipantId === seenRecord.chatParticipantId,
+				);
+				if (alreadySeen) return state;
 				return {
 					messagesById: {
 						...state.messagesById,
-						[messageId]: updatedMessage,
+						[seenRecord.messageId]: {
+							...message,
+							seenBy: [...(message.seenBy ?? []), seenRecord]
+						}
 					},
 				};
 			});
 		},
-		markAllMessagesAsSeen: (chatId: string, chatParticipantId: string) => {
+		markAllMessagesAsSeen: (seenRecord: MessageSeen[]) => {
 			set((state) => {
-				const messageIds = state.chatMessages[chatId] ?? [];
+				const seenMap = new Map(seenRecord.map((s) => [s.messageId, s]));
 				const updatedMessagesById = { ...state.messagesById };
+				let stateChanged = false;
 
-				messageIds.forEach((messageId) => {
+				seenMap.forEach((seenRecord, messageId) => {
 					const message = updatedMessagesById[messageId];
-					if (message && !message.seenBy?.includes(chatParticipantId)) {
+					if (!message) return;
+					const alreadySeen = message.seenBy.some(
+						(s) => s.chatParticipantId === seenRecord.chatParticipantId,
+					);
+					if (!alreadySeen) {
+						stateChanged = true;
 						updatedMessagesById[messageId] = {
 							...message,
-							seenBy: [...(message.seenBy ?? []), chatParticipantId],
+							seenBy: [...message.seenBy, seenRecord],
 						};
 					}
 				});
-
+				if (!stateChanged) return state;
 				return {
 					messagesById: updatedMessagesById,
 				};
