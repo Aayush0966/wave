@@ -24,7 +24,7 @@ const MessageComposer = ({
 		if (!content) return;
 		formRef.current?.reset();
 		const now = new Date();
-		const temporaryMessageId = crypto.randomUUID();
+		const temporaryMessageId = `temp-${crypto.randomUUID()}`;
 		sendMessage({
 			content: content,
 			chatId,

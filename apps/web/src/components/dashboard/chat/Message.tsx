@@ -1,4 +1,5 @@
 "use client";
+import type { MessageStatus } from "@prisma/client";
 import type { MessageFull } from "@wave/db";
 import { Check, CheckCheck, Clock3 } from "lucide-react";
 
@@ -10,18 +11,27 @@ type MessageProps = {
 const Message = ({ message, currentUserId }: MessageProps) => {
 	const createdAt = new Date(message.createdAt);
 	const isOwnMessage = message.senderId === currentUserId;
-	const status = {
+	type ExtendedStatus = MessageStatus | "SEEN";
+
+	const STATUS_CONFIG: Record<
+		ExtendedStatus,
+		{
+			label: string;
+			icon: typeof Check;
+			className: string;
+		}
+	> = {
 		PENDING: { label: "Pending", icon: Clock3, className: "text-emerald-100" },
 		SENT: { label: "Sent", icon: Check, className: "text-emerald-100" },
-		DELIVERED: {
-			label: "Delivered",
-			icon: CheckCheck,
-			className: "text-emerald-100",
-		},
+		DELIVERED: { label: "Delivered", icon: CheckCheck, className: "text-emerald-100" },
 		SEEN: { label: "Seen", icon: CheckCheck, className: "text-blue-300" },
-	}[(message.seenBy?.length ?? 0) > 0 ? "SEEN" : message.messageStatus];
-	const StatusIcon = status.icon;
+	};
 
+	const currentStatusKey: ExtendedStatus =
+		(message.seenBy?.length ?? 0) > 0 ? "SEEN" : message.messageStatus;
+
+	const status = STATUS_CONFIG[currentStatusKey];
+	const StatusIcon = status.icon;
 	return (
 		<div
 			className={`flex w-full ${isOwnMessage ? "justify-end" : "justify-start"}`}

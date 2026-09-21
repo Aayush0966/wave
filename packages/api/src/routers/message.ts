@@ -33,9 +33,8 @@ export const message = router({
 	getMessagesByChatId: protectedProcedure
 		.input(getMessagesByChatIdSchema)
 		.query(async ({ input, ctx }) => {
-			const { chatId } = input;
-
-			return ctx.repos.message.getMessagesByChatId(chatId);
+			const { chatId, cursor, limit } = input;
+			return ctx.repos.message.getMessagesByChatId(chatId, cursor, limit);
 		}),
 	// createMessageSeen: protectedProcedure
 	// 	.input(createMessageSeenSchema)

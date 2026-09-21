@@ -11,7 +11,7 @@ export const createMessageSchema = z.object({
 export const getMessagesByChatIdSchema = z.object({
 	chatId: z.string().min(1, "Chat ID is required"),
 	limit: z.number().optional(),
-	offset: z.number().optional(),
+	cursor: z.string().optional(),
 });
 
 

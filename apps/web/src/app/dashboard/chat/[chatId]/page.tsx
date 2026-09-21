@@ -17,16 +17,23 @@ const page = async ({ params }: { params: Promise<{ chatId: string }> }) => {
 	}
 	const serverTrpc = await trpc();
 	const chat = await serverTrpc.chat.getChatById({ chatId });
+	if (!chat) {
+		redirect("/dashboard");
+	}
 	const otherParticipant = chat.chatParticipants.find(
-		(participant: { user: { id: string } }) =>
+		(participant) =>
 			participant.user.id !== session.user.id,
 	);
-	const messages =
+	const result =
 		(await serverTrpc.message.getMessagesByChatId({ chatId })) ?? [];
 	const sender = chat.chatParticipants.find(
-		(participant: { user: { id: string } }) =>
+		(participant) =>
 			participant.user.id === session.user.id,
 	);
+	console.log("chat", chat);
+	if (!sender) {
+		redirect("/dashboard");
+	}
 	const sendMessageForChat = sendMessage.bind(null, chatId, sender.id);
 
 	return (
@@ -77,16 +84,18 @@ const page = async ({ params }: { params: Promise<{ chatId: string }> }) => {
 
 			{/* messages */}
 			<MessageList
-				initialMessages={messages}
+				initialMessages={result.messages}
 				senderId={sender.id}
 				chatId={chatId}
+				initialHasMore={result.hasMore}
+				cursor={result.nextCursor}
 			/>
 
 			{/* message composer */}
 			<MessageComposer
 				action={sendMessageForChat}
 				chatId={chatId}
-				senderId={sender.id}
+				senderId={sender.user.id}
 			/>
 		</div>
 	);

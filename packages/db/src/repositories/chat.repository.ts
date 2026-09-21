@@ -1,46 +1,6 @@
-import type { Message, PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import type { CreateChatParams } from "../schemas/chat.schemas";
 import CreteRepository from "./base.repository";
-
-export type ChatListType = {
-	title: string;
-	id: string;
-	image: string | null;
-	lastMessage: string;
-	name: string | null;
-	lastMessageSentBy: string;
-	time: string | null;
-	unseenMessageCount: number;
-};
-
-export type ChatDetailsType = {
-	id: string;
-	title: string;
-	chatName: string | null;
-	lastMessage: Message | null;
-	chatParticipants: {
-		userId: string;
-		user: {
-			id: string;
-			name: string | null;
-			image: string | null;
-		};
-	}[];
-	messages: {
-		id: string;
-		content: string | null;
-		senderId: string;
-		createdAt: Date | null;
-		sender: {
-			user: {
-				id: string;
-				name: string | null;
-				image: string | null;
-			};
-		};
-	}[];
-	lastMessageTime: Date | null;
-};
 
 const CreateChatRepository = (db: PrismaClient) => {
 	return {
@@ -156,7 +116,7 @@ const CreateChatRepository = (db: PrismaClient) => {
 		}: {
 			chatId: string;
 			userId: string;
-		}): Promise<ChatDetailsType | null> => {
+		}) => {
 			const chat = await db.chat.findUniqueOrThrow({
 				where: { id: chatId },
 				include: {

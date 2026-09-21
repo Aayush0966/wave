@@ -1,7 +1,7 @@
+import type { MessageSeen } from "@prisma/client";
+import type { MessageFull } from "@wave/db";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import type { MessageFull } from "@wave/db";
-import type { MessageSeen } from "@prisma/client";
 
 export type Chat = {
 	id: string;
@@ -14,7 +14,6 @@ export type Chat = {
 	unseenMessageCount: number;
 };
 
-
 type ChatStore = {
 	chats: Chat[];
 	setChats: (chats: Chat[]) => void;
@@ -26,6 +25,8 @@ type ChatStore = {
 	replaceMessage: (message: MessageFull, tempId: string) => void;
 	markMessageAsSeen: (seenRecord: MessageSeen) => void;
 	markAllMessagesAsSeen: (seenRecord: MessageSeen[]) => void;
+	prependMessages: (chatId: string, olderMessages: MessageFull[]) => void;
+	setInitialMessages: (chatId: string, messages: MessageFull[]) => void;
 };
 
 export const useChatStore = create<ChatStore>()(
@@ -72,7 +73,8 @@ export const useChatStore = create<ChatStore>()(
 				const message = state.messagesById[seenRecord.messageId];
 				if (!message) return state;
 				const alreadySeen = message.seenBy.some(
-					(s) => s.chatParticipantId === seenRecord.chatParticipantId,
+					(s: MessageSeen) =>
+						s.chatParticipantId === seenRecord.chatParticipantId,
 				);
 				if (alreadySeen) return state;
 				return {
@@ -80,8 +82,8 @@ export const useChatStore = create<ChatStore>()(
 						...state.messagesById,
 						[seenRecord.messageId]: {
 							...message,
-							seenBy: [...(message.seenBy ?? []), seenRecord]
-						}
+							seenBy: [...(message.seenBy ?? []), seenRecord],
+						},
 					},
 				};
 			});
@@ -96,7 +98,8 @@ export const useChatStore = create<ChatStore>()(
 					const message = updatedMessagesById[messageId];
 					if (!message) return;
 					const alreadySeen = message.seenBy.some(
-						(s) => s.chatParticipantId === seenRecord.chatParticipantId,
+						(s: MessageSeen) =>
+							s.chatParticipantId === seenRecord.chatParticipantId,
 					);
 					if (!alreadySeen) {
 						stateChanged = true;
@@ -112,5 +115,49 @@ export const useChatStore = create<ChatStore>()(
 				};
 			});
 		},
+		prependMessages: (chatId: string, olderMessages: MessageFull[]) => {
+			set((state) => {
+				const existingMessagesIds = state.chatMessages[chatId] ?? [];
+				const newMessagesById = { ...state.messagesById };
+				const incomingMessagesIds: string[] = [];
+				olderMessages.forEach((message) => {
+					newMessagesById[message.id] = message;
+
+					if (!existingMessagesIds.includes(message.id)) {
+						incomingMessagesIds.push(message.id);
+					}
+				});
+
+				return {
+					messagesById: newMessagesById,
+					chatMessages: {
+						...state.chatMessages,
+						[chatId]: [...incomingMessagesIds, ...existingMessagesIds],
+					},
+				};
+			});
+		},
+		setInitialMessages: (chatId: string, messages: MessageFull[]) =>
+			set((state) => {
+				const existingIds = state.chatMessages[chatId];
+				// If the store already has messages for this chat, don't overwrite them
+				if (existingIds && existingIds.length > 0) return state;
+
+				const newMessagesById = { ...state.messagesById };
+				const ids: string[] = [];
+
+				messages.forEach((msg) => {
+					newMessagesById[msg.id] = msg;
+					ids.push(msg.id);
+				});
+
+				return {
+					messagesById: newMessagesById,
+					chatMessages: {
+						...state.chatMessages,
+						[chatId]: ids,
+					},
+				};
+			}),
 	})),
 );
