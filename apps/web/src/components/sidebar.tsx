@@ -1,4 +1,5 @@
 import { icons } from "@wave/ui";
+import { signOut } from "better-auth/api";
 import {
 	BarChart,
 	LogOutIcon,
@@ -9,6 +10,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import LogoutButton from "./LogoutButton";
 
 const Sidebar = () => {
 	const navItems = [
@@ -17,7 +19,6 @@ const Sidebar = () => {
 		{ label: "Profile", icon: User, route: "/dashboard/profile" },
 		{ label: "Reports", icon: BarChart, route: "/dashboard/reports" },
 		{ label: "Settings", icon: Settings, route: "/dashboard/settings" },
-		{ label: "Logout", icon: LogOutIcon, route: "/logout" },
 	];
 
 	return (
@@ -48,7 +49,7 @@ const Sidebar = () => {
 
 				<div className="my-2 h-px w-12 bg-gray-300 dark:bg-gray-600" />
 
-				{navItems.slice(3).map((item) => {
+				{navItems.slice(3, 5).map((item) => {
 					const Icon = item.icon;
 					return (
 						<Link
@@ -61,6 +62,8 @@ const Sidebar = () => {
 						</Link>
 					);
 				})}
+
+				<LogoutButton />
 			</nav>
 		</div>
 	);
