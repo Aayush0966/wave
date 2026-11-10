@@ -25,6 +25,7 @@ export function useSharedChatRoom({
 	const isFocusedRef = useRef(isFocused);
 	isFocusedRef.current = isFocused;
 	// Check and mark unseen messages when focus or messages list updates
+	const markMessageIdsRef = useRef(new Set<string>());
 	useEffect(() => {
 		if (!isFocused) return;
 
@@ -32,12 +33,17 @@ export function useSharedChatRoom({
 			(m) =>
 				m.senderId !== senderId &&
 				!m.id.startsWith("temp-") &&
+				!markMessageIdsRef.current.has(m.id) &&
 				!m.seenBy?.some((s: MessageSeen) => s.chatParticipantId === senderId),
 		);
 
 		if (unseenMessages.length === 0) return;
+		const messageIds = unseenMessages.map((m) => m.id);
+		messageIds.forEach((id) => {
+			markMessageIdsRef.current.add(id);
+		});
 
-		onMarkAsSeenRef.current(unseenMessages.map((m) => m.id));
+		onMarkAsSeenRef.current(messageIds);
 	}, [isFocused, messages, senderId]);
 
 	// Bind Pusher events

@@ -21,14 +21,12 @@ const page = async ({ params }: { params: Promise<{ chatId: string }> }) => {
 		redirect("/dashboard");
 	}
 	const otherParticipant = chat.chatParticipants.find(
-		(participant) =>
-			participant.user.id !== session.user.id,
+		(participant) => participant.user.id !== session.user.id,
 	);
 	const result =
 		(await serverTrpc.message.getMessagesByChatId({ chatId })) ?? [];
 	const sender = chat.chatParticipants.find(
-		(participant) =>
-			participant.user.id === session.user.id,
+		(participant) => participant.user.id === session.user.id,
 	);
 	console.log("chat", chat);
 	if (!sender) {
@@ -95,7 +93,7 @@ const page = async ({ params }: { params: Promise<{ chatId: string }> }) => {
 			<MessageComposer
 				action={sendMessageForChat}
 				chatId={chatId}
-				senderId={sender.user.id}
+				senderId={sender.id}
 			/>
 		</div>
 	);

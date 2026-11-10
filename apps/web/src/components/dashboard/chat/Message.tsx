@@ -23,7 +23,11 @@ const Message = ({ message, currentUserId }: MessageProps) => {
 	> = {
 		PENDING: { label: "Pending", icon: Clock3, className: "text-emerald-100" },
 		SENT: { label: "Sent", icon: Check, className: "text-emerald-100" },
-		DELIVERED: { label: "Delivered", icon: CheckCheck, className: "text-emerald-100" },
+		DELIVERED: {
+			label: "Delivered",
+			icon: CheckCheck,
+			className: "text-emerald-100",
+		},
 		SEEN: { label: "Seen", icon: CheckCheck, className: "text-blue-300" },
 	};
 
@@ -34,7 +38,7 @@ const Message = ({ message, currentUserId }: MessageProps) => {
 	const StatusIcon = status.icon;
 	return (
 		<div
-			className={`flex w-full ${isOwnMessage ? "justify-end" : "justify-start"}`}
+			className={`flex w-full ${!isOwnMessage ? "justify-start" : "justify-end"}`}
 		>
 			<div
 				className={`max-w-[min(80%,32rem)] rounded-2xl px-4 py-3 shadow-sm ${
@@ -56,7 +60,7 @@ const Message = ({ message, currentUserId }: MessageProps) => {
 						})}
 					</time>
 					{isOwnMessage && (
-						<span title={status.label} aria-label={status.label}>
+						<span title={status.label}>
 							<StatusIcon
 								className={status.className}
 								size={14}
