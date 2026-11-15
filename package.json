@@ -17,7 +17,8 @@
 		"db:studio": "turbo -F @wave/db db:studio",
 		"db:generate": "turbo -F @wave/db db:generate",
 		"db:migrate": "turbo -F @wave/db db:migrate",
-		"db:clear": "pnpm exec tsx clear-db.ts"
+		"db:clear": "pnpm exec tsx clear-db.ts",
+		"media:cleanup": "tsx scripts/cleanup-chat-media.ts"
 	},
 	"dependencies": {
 		"@lottiefiles/dotlottie-react": "catalog:",
@@ -40,16 +41,13 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
-		"@testing-library/jest-dom": "catalog:",
-		"@testing-library/react": "catalog:",
 		"@types/node": "catalog:",
 		"@types/nodemailer": "catalog:",
 		"tailwindcss": "catalog:",
 		"ts-node": "catalog:",
 		"tsdown": "catalog:",
 		"tsx": "^4.23.12",
-		"turbo": "catalog:",
-		"vitest": "catalog:"
+		"turbo": "catalog:"
 	},
 	"packageManager": "pnpm@10.17.1"
 }

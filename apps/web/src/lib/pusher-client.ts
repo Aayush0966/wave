@@ -1,11 +1,15 @@
 import PusherClient from "pusher-js";
 
 const appKey = process.env.NEXT_PUBLIC_PUSHER_KEY;
+const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
 
-if (!appKey) {
-	throw new Error("NEXT_PUBLIC_PUSHER_KEY is required to initialize Pusher");
+if (!appKey || !cluster) {
+	throw new Error(
+		"Pusher key and cluster are required to initialize realtime chat",
+	);
 }
 
 export const pusherClient = new PusherClient(appKey, {
-	cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+	cluster,
+	channelAuthorization: { endpoint: "/api/pusher/auth", transport: "ajax" },
 });

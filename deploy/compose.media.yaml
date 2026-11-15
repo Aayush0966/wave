@@ -1,0 +1,9 @@
+# Merge into your web service's Compose deployment. Keep this volume across releases.
+services:
+  web:
+    environment:
+      MEDIA_STORAGE_DIR: /var/lib/wave/chat-media
+    volumes:
+      - chat-media:/var/lib/wave/chat-media
+volumes:
+  chat-media:

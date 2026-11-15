@@ -8,9 +8,11 @@ export const sendMessage = async (
 	formData: FormData,
 ) => {
 	const content = String(formData.get("content") ?? "").trim();
-	if (!content) return; // good for now, but we should handle this better in the future
+	if (!content) return;
 	const serverTrpc = await trpc();
 	const message = await serverTrpc.message.createMessage({
+		clientMessageId: String(formData.get("clientMessageId") || ""),
+		replyToId: String(formData.get("replyToId") || "") || undefined,
 		chatId,
 		content,
 		messageType: "TEXT",

@@ -5,6 +5,11 @@ model Message {
     sender      ChatParticipant @relation(fields: [senderId], references: [id])
     messageStatus MessageStatus   @default(PENDING)
     content     String?
+    clientMessageId String?
+    editedAt DateTime?
+    replyToId String?
+    replyTo Message? @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+    replies Message[] @relation("MessageReplies")
     chatId      String
     chat        Chat            @relation(fields: [chatId], references: [id])
     reacts      React[]
@@ -15,7 +20,8 @@ model Message {
     updatedAt         DateTime            @updatedAt
     MessageAttachment MessageAttachment[]
 
-    @@index([chatId])
+    @@index([chatId, createdAt, id])
+    @@unique([senderId, clientMessageId])
 }
 
 model MessageAttachment {

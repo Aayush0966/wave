@@ -16,6 +16,7 @@ model ChatParticipant {
   userId        String
   user          User                @relation(fields: [userId], references: [id])
   role          ChatParticipantRole @default(MEMBER)
+  removedAt     DateTime?
   joinedAt      DateTime            @default(now())
   messages      Message[]
   messageSeen   MessageSeen[]
@@ -28,3 +29,14 @@ model ChatParticipant {
 }
 
 
+
+model UserBlock {
+  blockerId String
+  blockedId String
+  blocker User @relation("UserBlocks", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlockedByUsers", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([blockerId, blockedId])
+  @@index([blockedId])
+}

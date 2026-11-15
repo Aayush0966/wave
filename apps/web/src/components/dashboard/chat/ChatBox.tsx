@@ -1,23 +1,35 @@
+"use client";
+import type { Chat } from "@wave/state";
 import { avatars } from "@wave/ui";
+import { Ban, BellOff, Pin } from "lucide-react";
 import Image from "next/image";
-import type { Chat } from "@/types/message";
+import { useEffect, useState } from "react";
+import { formatChatTime } from "@/lib/format-chat-time";
 
-const ChatBox = ({ chat, name }: { chat: Chat; name: string }) => {
-	const formattedTime = (time: string) => {
-		const now = new Date();
-		const date = new Date(time);
-		const diff = now.getTime() - date.getTime();
-		const diffMins = Math.floor(diff / (1000 * 60));
-		const diffHours = Math.floor(diff / (1000 * 60 * 60));
-
-		if (diffHours >= 1) {
-			return `${diffHours} ago`;
-		}
-		return `${diffMins} ago`;
-	};
+const ChatBox = ({
+	chat,
+	name,
+	active = false,
+	pinned = false,
+	muted = false,
+}: {
+	chat: Chat;
+	name: string;
+	active?: boolean;
+	pinned?: boolean;
+	muted?: boolean;
+}) => {
+	const [now, setNow] = useState<number | null>(null);
+	useEffect(() => {
+		setNow(Date.now());
+		const timer = setInterval(() => setNow(Date.now()), 30_000);
+		return () => clearInterval(timer);
+	}, []);
 
 	return (
-		<div className="group mx-2 my-1 flex h-20 w-112.5 cursor-pointer items-center rounded-2xl border border-gray-200 p-4 transition-all duration-300 ease-out hover:border-gray-200 hover:bg-gray-200 dark:border-gray-500 dark:shadow-gray-900/20 dark:hover:border-gray-700 dark:hover:bg-background-tertiary">
+		<div
+			className={`group flex min-h-20 min-w-0 items-center rounded-xl py-4 pr-9 pl-3 transition-colors ${active ? "bg-emerald-50 ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:ring-emerald-800" : "hover:bg-gray-100 dark:hover:bg-white/5"}`}
+		>
 			<div className="relative h-14 w-14 shrink-0">
 				<Image
 					alt="profile image"
@@ -26,31 +38,59 @@ const ChatBox = ({ chat, name }: { chat: Chat; name: string }) => {
 					height={56}
 					className="rounded-full object-cover ring-2 ring-gray-200 transition-all duration-200 group-hover:ring-gray-300 dark:ring-gray-700 dark:group-hover:ring-gray-600"
 				/>
-				<div className="absolute -right-0.5 -bottom-0.5 h-4 w-4 rounded-full border-2 border-white bg-emerald-500 shadow-sm transition-all duration-200 dark:border-gray-800" />
 			</div>
 
 			<div className="ml-4 flex min-w-0 flex-1 flex-col justify-center space-y-1">
 				<div className="flex items-center justify-between">
-					<h3 className="truncate pb-3 font-sans font-semibold text-gray-900 text-lg leading-tight tracking-wide group-hover:text-gray-800 dark:text-text-primary dark:group-hover:text-white">
-						{chat.title
-							? chat.title
-							: chat.name
-								? chat.name
-								: name
-									? name
-									: "Unknown"}
-					</h3>
-					<span className="ml-3 shrink-0 font-medium text-gray-500 text-xs tracking-wide group-hover:text-gray-600 dark:text-text-secondary dark:group-hover:text-gray-300">
-						{chat.time ? formattedTime(chat.time) : ""}
+					<div className="flex min-w-0 items-center gap-1.5">
+						<h3 className="truncate font-semibold text-gray-900 text-sm dark:text-text-primary">
+							{chat.title
+								? chat.title
+								: chat.name
+									? chat.name
+									: name
+										? name
+										: "Unknown"}
+						</h3>
+						{pinned && (
+							<span title="Pinned" className="shrink-0 text-gray-400">
+								<Pin size={11} />
+								<span className="sr-only">Pinned</span>
+							</span>
+						)}
+						{chat.blockedByMe && (
+							<span title="Blocked" className="shrink-0 text-gray-400">
+								<Ban size={11} />
+								<span className="sr-only">Blocked</span>
+							</span>
+						)}
+						{muted && (
+							<span
+								title="Notifications muted"
+								className="shrink-0 text-gray-400"
+							>
+								<BellOff size={11} />
+								<span className="sr-only">Notifications muted</span>
+							</span>
+						)}
+					</div>
+					<span className="ml-2 shrink-0 text-[10px] text-gray-500 dark:text-text-secondary">
+						{chat.time && now !== null ? formatChatTime(chat.time, now) : ""}
 					</span>
 				</div>
 				<div className="flex items-center justify-between">
-					<p className="flex-1 truncate font-normal text-gray-600 text-sm leading-relaxed group-hover:text-gray-700 dark:text-text-secondary dark:group-hover:text-gray-300">
-						{chat.lastMessage}
+					<p
+						className={`flex-1 truncate text-sm leading-relaxed ${chat.unseenMessageCount > 0 ? "font-medium text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-text-secondary"}`}
+					>
+						{chat.lastMessage && chat.lastMessageSentBy === chat.participantId
+							? "You: "
+							: ""}
+						{chat.lastMessage || "Start a conversation"}
 					</p>
 					{chat.unseenMessageCount > 0 && (
-						<div className="ml-3 flex h-5 w-5 min-w-5 items-center justify-center rounded-full bg-linear-to-r from-blue-500 to-blue-600 font-semibold text-white text-xs shadow-lg transition-all duration-200">
+						<div className="ml-3 flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-600 px-1 font-semibold text-white text-xs">
 							{chat.unseenMessageCount > 99 ? "99+" : chat.unseenMessageCount}
+							<span className="sr-only"> unread messages</span>
 						</div>
 					)}
 				</div>

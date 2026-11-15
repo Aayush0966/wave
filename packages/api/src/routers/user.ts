@@ -3,6 +3,12 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 
 export const user = router({
+	me: protectedProcedure.query(async ({ ctx }) => {
+		const profile = await ctx.repos.user.getCurrentProfile(ctx.session.user.id);
+		if (!profile)
+			throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
+		return profile;
+	}),
 	getProfile: protectedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {

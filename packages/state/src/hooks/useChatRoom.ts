@@ -1,80 +1,153 @@
 import type { MessageSeen } from "@prisma/client";
-import type { MessageFull } from "@wave/db";
+import type { MessageFull, MessageReactionUpdate } from "@wave/db";
+import type Pusher from "pusher-js";
 import { useEffect, useRef } from "react";
 import { useChatStore } from "../chat.store";
+import { retainChatChannel } from "../chat-channels";
+import { createReceiptQueue, createSyncQueue } from "../chat-recovery";
+import { deserializeMessage } from "../deserialize-message";
 
 type SharedChatRoomOptions = {
 	chatId: string;
 	senderId: string;
 	messages: MessageFull[];
 	isFocused: boolean;
-	pusherClient: any;
-	onMarkAsSeen: (messageIds: string[]) => void;
+	pusherClient: Pusher;
+	onMarkAsSeen: (messageIds: string[]) => Promise<void>;
+	onResync: () => Promise<void>;
 };
 
-export function useSharedChatRoom({
-	chatId,
-	senderId,
-	messages,
-	isFocused,
-	pusherClient,
-	onMarkAsSeen,
-}: SharedChatRoomOptions) {
-	const onMarkAsSeenRef = useRef(onMarkAsSeen);
-	onMarkAsSeenRef.current = onMarkAsSeen;
-	const isFocusedRef = useRef(isFocused);
-	isFocusedRef.current = isFocused;
-	// Check and mark unseen messages when focus or messages list updates
-	const markMessageIdsRef = useRef(new Set<string>());
+export function useSharedChatRoom(options: SharedChatRoomOptions) {
+	const { chatId, senderId, messages, isFocused, pusherClient } = options;
+	const latest = useRef(options);
+	latest.current = options;
+	const receipts = useRef<ReturnType<typeof createReceiptQueue> | null>(null);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: A different chat or participant must get a fresh acknowledgment queue.
 	useEffect(() => {
-		if (!isFocused) return;
-
-		const unseenMessages = messages.filter(
-			(m) =>
-				m.senderId !== senderId &&
-				!m.id.startsWith("temp-") &&
-				!markMessageIdsRef.current.has(m.id) &&
-				!m.seenBy?.some((s: MessageSeen) => s.chatParticipantId === senderId),
+		const worker = createReceiptQueue((ids) =>
+			latest.current.onMarkAsSeen(ids),
 		);
-
-		if (unseenMessages.length === 0) return;
-		const messageIds = unseenMessages.map((m) => m.id);
-		messageIds.forEach((id) => {
-			markMessageIdsRef.current.add(id);
-		});
-
-		onMarkAsSeenRef.current(messageIds);
-	}, [isFocused, messages, senderId]);
-
-	// Bind Pusher events
-	useEffect(() => {
-		const channelName = `chat-${chatId}`;
-		const channel = pusherClient.subscribe(channelName);
-
-		channel.bind("new-message", (message: MessageFull) => {
-			if (message.senderId === senderId) return;
-			useChatStore.getState().addMessage(message);
-
-			if (isFocused) {
-				onMarkAsSeenRef.current([message.id]);
-			}
-		});
-
-		channel.bind("message-seen", (data: MessageSeen) => {
-			if (data.chatParticipantId === senderId) return;
-			useChatStore.getState().markMessageAsSeen(data);
-		});
-
-		channel.bind("messages-seen", (data: MessageSeen[]) => {
-			const filtered = data.filter((m) => m.chatParticipantId !== senderId);
-			if (filtered.length > 0) {
-				useChatStore.getState().markAllMessagesAsSeen(filtered);
-			}
-		});
-
+		receipts.current = worker;
 		return () => {
-			channel.unbind_all();
-			pusherClient.unsubscribe(channelName);
+			worker.dispose();
+			receipts.current = null;
 		};
-	}, [chatId, senderId, isFocused, pusherClient]);
+	}, [chatId, senderId]);
+	useEffect(() => {
+		const ids = messages
+			.filter(
+				(item) =>
+					item.chatId === chatId &&
+					item.senderId !== senderId &&
+					!item.id.startsWith("temp-") &&
+					!item.deletedBy.some(
+						(deleted) => deleted.deleteType === "EVERYONE",
+					) &&
+					!item.seenBy.some((seen) => seen.chatParticipantId === senderId),
+			)
+			.map((item) => item.id);
+		receipts.current?.replace(ids, isFocused);
+	}, [chatId, senderId, messages, isFocused]);
+
+	useEffect(() => {
+		const { channel, release } = retainChatChannel(pusherClient, chatId);
+		const recovery = createSyncQueue(
+			() => latest.current.onResync(),
+			(value) => {
+				useChatStore.setState((state) => ({
+					syncState: { ...state.syncState, [chatId]: value },
+				}));
+			},
+		);
+		const apply = recovery.apply;
+		const resync = () =>
+			pusherClient.connection.state === "connected"
+				? recovery.resync()
+				: Promise.resolve();
+
+		const presence = () => {
+			const ids: string[] = [];
+			channel.members.each((member: { id: string }) => ids.push(member.id));
+			useChatStore.getState().setPresence(chatId, ids);
+		};
+		const subscribed = () => {
+			presence();
+			void resync();
+		};
+		const onNew = (message: MessageFull) =>
+			apply(() =>
+				useChatStore.getState().addMessage(deserializeMessage(message)),
+			);
+		const onSeen = (records: MessageSeen[]) =>
+			apply(() =>
+				useChatStore.getState().markAllMessagesAsSeen(
+					records.map((record) => ({
+						...record,
+						seenAt: new Date(record.seenAt),
+					})),
+				),
+			);
+		const onReact = (update: MessageReactionUpdate) =>
+			apply(() => useChatStore.getState().applyMessageReaction(update));
+		const onUnsent = (message: MessageFull) =>
+			apply(() =>
+				useChatStore.getState().applyUnsentMessage(deserializeMessage(message)),
+			);
+		const onEdited = (message: MessageFull) =>
+			apply(() =>
+				useChatStore.getState().updateMessage(deserializeMessage(message)),
+			);
+		const onTyping = (data: {
+			participantId: string;
+			typing: boolean;
+			name: string;
+		}) =>
+			useChatStore
+				.getState()
+				.setTyping(chatId, data.participantId, data.name, data.typing);
+		const connection = ({ current }: { current: string }) => {
+			useChatStore.setState({ connectionState: current });
+			if (current !== "connected")
+				useChatStore.getState().setPresence(chatId, []);
+		};
+		channel.bind("pusher:subscription_succeeded", subscribed);
+		channel.bind("pusher:member_added", presence);
+		channel.bind("pusher:member_removed", presence);
+		channel.bind("new-message", onNew);
+		channel.bind("messages-seen", onSeen);
+		channel.bind("message-reaction", onReact);
+		channel.bind("message-unsent", onUnsent);
+		channel.bind("message-edited", onEdited);
+		channel.bind("typing", onTyping);
+		pusherClient.connection.bind("state_change", connection);
+		useChatStore.setState({ connectionState: pusherClient.connection.state });
+		if (channel.subscribed) subscribed();
+		const focus = () => {
+			if (document.visibilityState === "visible") void resync();
+		};
+		window.addEventListener("focus", focus);
+		window.addEventListener("online", focus);
+		document.addEventListener("visibilitychange", focus);
+		const interval = setInterval(() => {
+			if (latest.current.isFocused) void resync();
+		}, 15000);
+		return () => {
+			recovery.dispose();
+			release();
+			clearInterval(interval);
+			window.removeEventListener("focus", focus);
+			window.removeEventListener("online", focus);
+			document.removeEventListener("visibilitychange", focus);
+			pusherClient.connection.unbind("state_change", connection);
+			channel.unbind("pusher:subscription_succeeded", subscribed);
+			channel.unbind("pusher:member_added", presence);
+			channel.unbind("pusher:member_removed", presence);
+			channel.unbind("new-message", onNew);
+			channel.unbind("messages-seen", onSeen);
+			channel.unbind("message-reaction", onReact);
+			channel.unbind("message-unsent", onUnsent);
+			channel.unbind("message-edited", onEdited);
+			channel.unbind("typing", onTyping);
+		};
+	}, [chatId, pusherClient]);
 }

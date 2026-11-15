@@ -1,4 +1,6 @@
 model User {
+  blockedUsers UserBlock[] @relation("UserBlocks")
+  blockedBy UserBlock[] @relation("BlockedByUsers")
   id               String            @id @map("_id") @default(uuid())
   name             String
   email            String            @unique

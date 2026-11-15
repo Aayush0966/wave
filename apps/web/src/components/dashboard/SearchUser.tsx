@@ -1,138 +1,141 @@
 "use client";
-
-import { SearchIcon, Users, XIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Loader2, Search, SquarePen, UserRound, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Popover } from "radix-ui";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc-client";
-import { Input } from "../ui/input";
 
-const SearchUser = () => {
-	const [query, setQuery] = useState<string>("");
-	const [isDropdownVisible, setDropdownVisible] = useState<boolean>(false);
-	const dropdownRef = useRef<HTMLDivElement>(null);
-
-	const {
-		data: users,
-		isLoading,
-		isError: searchError,
-	} = trpc.user.getByUsername.useQuery(
-		{ username: query },
-		{ enabled: query.length > 0 },
-	);
-
-	const handleClickOutside = (event: MouseEvent) => {
-		if (
-			dropdownRef.current &&
-			!dropdownRef.current.contains(event.target as Node)
-		) {
-			setDropdownVisible(false);
-		}
-	};
-
+export default function SearchUser() {
+	const [open, setOpen] = useState(false);
+	const [input, setInput] = useState("");
+	const [query, setQuery] = useState("");
 	useEffect(() => {
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, []);
-
-	const createChatMutation = trpc.chat.createChat.useMutation();
-
-	const handleUserClick = (userId: string) => {
-		setDropdownVisible(false);
-		createChatMutation.mutate({ userId: userId });
-	};
-
-	return (
-		<div className="mx-auto max-w-md p-4">
-			<div className="relative">
-				<SearchIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-				<Input
-					placeholder="Search users..."
-					maxLength={20}
-					type="text"
-					value={query}
-					onChange={(e) => {
-						setQuery(e.target.value.toLowerCase());
-						setDropdownVisible(true);
-					}}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") {
-							setDropdownVisible(true);
-						}
-					}}
-					className="h-12 w-full rounded-xl border-2 border-gray-200 bg-white pl-10 text-gray-700 text-lg! placeholder:text-base placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-background-tertiary dark:text-gray-200 dark:focus:border-blue-400"
-				/>
-				{query && (
-					<XIcon
-						className="absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2 cursor-pointer text-gray-400"
-						onClick={() => {
-							setQuery("");
-							setDropdownVisible(false);
-						}}
-					/>
-				)}
-			</div>
-
-			{isDropdownVisible && query && (
-				<div
-					ref={dropdownRef}
-					className="mt-3 max-h-80 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-background-tertiary"
-				>
-					{isLoading && (
-						<div className="flex items-center justify-center p-4">
-							<div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-							<span className="ml-2 text-gray-500">Searching...</span>
-						</div>
-					)}
-
-					{searchError && (
-						<div className="p-4 text-center text-red-500">
-							<span>Error searching users</span>
-						</div>
-					)}
-
-					{users && users.length > 0 ? (
-						users.map((user, index) => (
-							<div
-								onClick={() => handleUserClick(user.id)}
-								key={user.id}
-								className={`flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${index !== users.length - 1 ? "border-gray-100 border-b dark:border-gray-700" : ""}`}
-							>
-								<div className="flex items-center space-x-3">
-									<div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full">
-										{user.image ? (
-											<img
-												src={user.image}
-												alt={user.username}
-												className="h-full w-full object-cover"
-											/>
-										) : (
-											<div className="flex h-full w-full items-center justify-center bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
-												<Users className="h-5 w-5" />
-											</div>
-										)}
-									</div>
-									<div>
-										<div className="font-medium text-gray-900 dark:text-gray-100">
-											{user.name}
-										</div>
-										<div className="text-gray-500 text-sm dark:text-gray-400">
-											@{user.username}
-										</div>
-									</div>
-								</div>
-							</div>
-						))
-					) : users && users.length === 0 ? (
-						<div className="p-4 text-center text-gray-500">
-							<Users className="mx-auto h-8 w-8 text-gray-300" />
-							<span className="mt-2 block">No users found</span>
-						</div>
-					) : null}
-				</div>
-			)}
-		</div>
+		const timer = setTimeout(() => setQuery(input.trim().toLowerCase()), 250);
+		return () => clearTimeout(timer);
+	}, [input]);
+	const users = trpc.user.getByUsername.useQuery(
+		{ username: query },
+		{ enabled: open && !!query },
 	);
-};
-
-export default SearchUser;
+	const router = useRouter();
+	const utils = trpc.useUtils();
+	const create = trpc.chat.createChat.useMutation({
+		onSuccess: (chat) => {
+			setOpen(false);
+			setInput("");
+			setQuery("");
+			void utils.chat.getUserChats.invalidate();
+			router.push(`/dashboard/chat/${chat.id}`);
+		},
+		onError: () =>
+			toast.error("Could not open this conversation. Please try again."),
+	});
+	const waiting = input.trim().toLowerCase() !== query || users.isLoading;
+	return (
+		<Popover.Root open={open} onOpenChange={setOpen}>
+			<Popover.Trigger asChild>
+				<button
+					type="button"
+					aria-label="New message"
+					title="New message"
+					className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-text-secondary dark:hover:bg-background-tertiary"
+				>
+					<SquarePen size={19} />
+				</button>
+			</Popover.Trigger>
+			<Popover.Portal>
+				<Popover.Content
+					side="bottom"
+					align="end"
+					sideOffset={8}
+					collisionPadding={12}
+					aria-label="New message"
+					className="z-50 w-72 max-w-(--radix-popover-content-available-width) overflow-hidden rounded-xl border border-gray-200 bg-white text-night-800 shadow-[0_4px_16px_rgb(0_0_0_/0.12)] outline-none dark:border-gray-700 dark:bg-background-secondary dark:text-text-primary"
+				>
+					<div className="flex items-center gap-2 border-gray-100 border-b px-3 dark:border-gray-700">
+						<Search size={16} aria-hidden="true" className="text-gray-400" />
+						<input
+							aria-label="Find a person by username"
+							placeholder="Find a person…"
+							value={input}
+							maxLength={20}
+							onChange={(event) => setInput(event.target.value)}
+							className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"
+						/>
+						<Popover.Close
+							aria-label="Close new message"
+							className="rounded p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-background-tertiary"
+						>
+							<X size={15} />
+						</Popover.Close>
+					</div>
+					<div className="max-h-64 overflow-y-auto">
+						{!input.trim() && (
+							<p className="p-3 text-gray-500 text-xs dark:text-text-secondary">
+								Search by username to start a conversation.
+							</p>
+						)}
+						{!!input.trim() && waiting && (
+							<p
+								role="status"
+								className="flex items-center gap-2 p-3 text-gray-500 text-xs"
+							>
+								<Loader2 size={14} className="animate-spin" />
+								Searching…
+							</p>
+						)}
+						{!!input.trim() && !waiting && users.isError && (
+							<p role="alert" className="p-3 text-red-500 text-xs">
+								Could not search.{" "}
+								<button
+									type="button"
+									onClick={() => void users.refetch()}
+									className="underline"
+								>
+									Retry
+								</button>
+							</p>
+						)}
+						{!!query && !waiting && !users.isError && !users.data?.length && (
+							<p role="status" className="p-3 text-gray-500 text-xs">
+								No people found.
+							</p>
+						)}
+						{!!input.trim() &&
+							!waiting &&
+							users.data?.map((user) => (
+								<button
+									key={user.id}
+									type="button"
+									disabled={create.isPending}
+									onClick={() => create.mutate({ userId: user.id })}
+									className="flex w-full items-center gap-3 px-3 py-2.5 text-left outline-none hover:bg-gray-100 focus-visible:bg-gray-100 disabled:opacity-50 dark:focus-visible:bg-background-tertiary dark:hover:bg-background-tertiary"
+								>
+									{user.image ? (
+										<img
+											src={user.image}
+											alt=""
+											className="size-9 rounded-full object-cover"
+										/>
+									) : (
+										<span className="flex size-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-background-tertiary">
+											<UserRound size={17} />
+										</span>
+									)}
+									<span className="min-w-0">
+										<span className="block truncate font-medium text-sm">
+											{user.name}
+										</span>
+										<span className="block truncate text-gray-500 text-xs dark:text-text-secondary">
+											@{user.username}
+										</span>
+									</span>
+								</button>
+							))}
+					</div>
+				</Popover.Content>
+			</Popover.Portal>
+		</Popover.Root>
+	);
+}
